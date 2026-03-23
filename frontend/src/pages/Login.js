@@ -139,12 +139,17 @@ function Login() {
               <p className="text-red-500 text-sm mt-1">{errors.password}</p>
             )}
           </div>
-
+          <div className="flex justify-between items-center mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+            <button type="button" onClick={() => navigate('/forgot-password')} className="text-sm text-primary dark:text-blue-400 hover:underline">
+              Forgot password?
+            </button>
+          </div>
           {/* Keep me signed in (Custom Modern Checkbox) */}
           <div className="flex items-center cursor-pointer group" onClick={() => setRememberMe(!rememberMe)}>
             <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${rememberMe
-                ? 'bg-primary border-primary dark:bg-blue-600 dark:border-blue-600'
-                : 'bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-500 group-hover:border-primary'
+              ? 'bg-primary border-primary dark:bg-blue-600 dark:border-blue-600'
+              : 'bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-500 group-hover:border-primary'
               }`}>
               {rememberMe && (
                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

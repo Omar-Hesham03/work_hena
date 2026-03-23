@@ -10,7 +10,8 @@ import Profile from './pages/Profile';
 import ViewProfile from './pages/ViewProfile';
 import SavedJobs from './pages/SavedJobs';
 import AdminDashboard from './pages/AdminDashboard';
-
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 function App() {
   return (
     <Router>
@@ -35,7 +36,10 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/view-profile/:userId" element={<ViewProfile />} />
             <Route path="/saved-jobs" element={<SavedJobs />} />
-            <Route path="/admin" element={<AdminDashboard />} />  </Routes>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+          </Routes>
         </>
       </div>
     </Router>

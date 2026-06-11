@@ -17,6 +17,7 @@ const apiLimiter = rateLimit({
 });
 
 // Strict rate limiter for authentication routes - 5 requests per 15 minutes per IP
+// TODO: TEMPORARILY BYPASSED FOR TESTING IN DEV. RE-ENABLE BEFORE PRODUCTION.
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // Limit each IP to 5 login/register attempts per windowMs
@@ -25,10 +26,11 @@ const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Slow down requests as they approach the limit
+  skip: (req) => process.env.NODE_ENV !== 'production'
 });
 
 // Moderate rate limiter for account creation - 3 per hour
+// TODO: TEMPORARILY BYPASSED FOR TESTING IN DEV. RE-ENABLE BEFORE PRODUCTION.
 const accountCreationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3,
@@ -36,7 +38,8 @@ const accountCreationLimiter = rateLimit({
     error: 'Too many accounts created from this IP, please try again after an hour.'
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: (req) => process.env.NODE_ENV !== 'production'
 });
 
 // Rate limiter for job posting - 10 posts per hour (prevent spam)

@@ -1,7 +1,11 @@
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Email when someone applies to a job
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// ============================================
+// APPLICATION NOTIFICATION
+// ============================================
 const sendApplicationNotification = async (recruiterEmail, recruiterName, jobTitle, candidateName, candidateEmail) => {
   try {
     await resend.emails.send({
@@ -18,8 +22,8 @@ const sendApplicationNotification = async (recruiterEmail, recruiterName, jobTit
             <p><strong>Candidate:</strong> ${candidateName}</p>
             <p><strong>Email:</strong> ${candidateEmail}</p>
           </div>
-          <p>Log in to your WorkHena dashboard to review the application and respond to the candidate.</p>
-          <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard" style="display: inline-block; background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 10px;">
+          <p>Log in to your WorkHena dashboard to review the application.</p>
+          <a href="${FRONTEND_URL}/dashboard" style="display: inline-block; background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 10px;">
             View Application
           </a>
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #E5E7EB;">
@@ -33,14 +37,15 @@ const sendApplicationNotification = async (recruiterEmail, recruiterName, jobTit
   }
 };
 
-// Email when application status changes
+// ============================================
+// STATUS UPDATE NOTIFICATION
+// ============================================
 const sendStatusUpdateNotification = async (candidateEmail, candidateName, jobTitle, companyName, status) => {
   const statusMessages = {
     'reviewed': 'has been reviewed by the hiring team',
     'accepted': 'has been accepted! Congratulations! 🎉',
     'rejected': 'status has been updated'
   };
-
   const statusColors = {
     'reviewed': '#3B82F6',
     'accepted': '#10B981',
@@ -63,10 +68,10 @@ const sendStatusUpdateNotification = async (candidateEmail, candidateName, jobTi
             <p><strong>Status:</strong> <span style="color: ${statusColors[status]}; font-weight: bold;">${status.toUpperCase()}</span></p>
           </div>
           ${status === 'accepted' ?
-          '<p>🎉 <strong>Congratulations!</strong> The hiring team will contact you soon with next steps.</p>' :
+          '<p>🎉 <strong>Congratulations!</strong> The hiring team will contact you soon.</p>' :
           '<p>You can view more details in your WorkHena dashboard.</p>'
         }
-          <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard" style="display: inline-block; background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 10px;">
+          <a href="${FRONTEND_URL}/dashboard" style="display: inline-block; background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 10px;">
             View Dashboard
           </a>
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #E5E7EB;">
@@ -80,7 +85,9 @@ const sendStatusUpdateNotification = async (candidateEmail, candidateName, jobTi
   }
 };
 
-// Email when admin deletes a job
+// ============================================
+// JOB DELETION NOTIFICATION
+// ============================================
 const sendJobDeletionNotification = async (recruiterEmail, recruiterName, jobTitle, companyName, reason) => {
   try {
     await resend.emails.send({
@@ -91,16 +98,16 @@ const sendJobDeletionNotification = async (recruiterEmail, recruiterName, jobTit
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #EF4444;">Job Posting Removed</h2>
           <p>Hi ${recruiterName},</p>
-          <p>We're writing to inform you that your job posting has been removed from WorkHena:</p>
+          <p>Your job posting has been removed from WorkHena:</p>
           <div style="background-color: #FEE2E2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #EF4444;">
             <h3 style="margin-top: 0; color: #1F2937;">${jobTitle}</h3>
             <p><strong>Company:</strong> ${companyName}</p>
           </div>
           <div style="background-color: #F3F4F6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0;"><strong>Reason for removal:</strong></p>
+            <p style="margin: 0;"><strong>Reason:</strong></p>
             <p style="margin: 10px 0 0 0; color: #4B5563;">${reason}</p>
           </div>
-          <p>If you believe this was done in error or have questions, please contact our support team.</p>
+          <p>If you believe this was done in error, please contact our support team.</p>
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #E5E7EB;">
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
@@ -112,7 +119,9 @@ const sendJobDeletionNotification = async (recruiterEmail, recruiterName, jobTit
   }
 };
 
-// Email when admin deletes a user account
+// ============================================
+// ACCOUNT DELETION NOTIFICATION
+// ============================================
 const sendAccountDeletionNotification = async (userEmail, userName, reason) => {
   try {
     await resend.emails.send({
@@ -123,13 +132,12 @@ const sendAccountDeletionNotification = async (userEmail, userName, reason) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #EF4444;">Account Termination Notice</h2>
           <p>Hi ${userName},</p>
-          <p>We're writing to inform you that your WorkHena account has been terminated by our administration team.</p>
+          <p>Your WorkHena account has been terminated by our administration team.</p>
           <div style="background-color: #F3F4F6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0;"><strong>Reason for termination:</strong></p>
+            <p style="margin: 0;"><strong>Reason:</strong></p>
             <p style="margin: 10px 0 0 0; color: #4B5563;">${reason}</p>
           </div>
-          <p>Your account and all associated data have been removed from our platform.</p>
-          <p>If you believe this was done in error or have questions about this decision, please contact our support team.</p>
+          <p>If you believe this was done in error, please contact our support team.</p>
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #E5E7EB;">
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
@@ -154,17 +162,16 @@ const sendPasswordResetEmail = async (userEmail, userName, resetUrl) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #3B82F6;">Reset Your Password 🔐</h2>
           <p>Hi ${userName},</p>
-          <p>We received a request to reset your WorkHena password. Click the button below to choose a new password:</p>
+          <p>We received a request to reset your WorkHena password. Click the button below:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" style="display: inline-block; background-color: #3B82F6; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
               Reset My Password
             </a>
           </div>
           <div style="background-color: #FEF3C7; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #F59E0B;">
-            <p style="margin: 0; color: #92400E;">⚠️ This link will expire in <strong>1 hour</strong>. If you didn't request this, you can safely ignore this email.</p>
+            <p style="margin: 0; color: #92400E;">⚠️ This link expires in <strong>1 hour</strong>. If you didn't request this, ignore this email.</p>
           </div>
-          <p style="color: #6B7280; font-size: 14px;">If the button doesn't work, copy and paste this link into your browser:</p>
-          <p style="color: #3B82F6; font-size: 13px; word-break: break-all;">${resetUrl}</p>
+          <p style="color: #6B7280; font-size: 14px;">If the button doesn't work, copy this link: <span style="color: #3B82F6; word-break: break-all;">${resetUrl}</span></p>
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #E5E7EB;">
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
@@ -176,10 +183,45 @@ const sendPasswordResetEmail = async (userEmail, userName, resetUrl) => {
   }
 };
 
+// ============================================
+// EMAIL VERIFICATION
+// ============================================
+const sendVerificationEmail = async (userEmail, userName, verifyUrl) => {
+  try {
+    await resend.emails.send({
+      from: 'WorkHena <onboarding@resend.dev>',
+      to: userEmail,
+      subject: 'Verify Your WorkHena Email',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #10B981;">Verify Your Email ✉️</h2>
+          <p>Hi ${userName}, welcome to WorkHena!</p>
+          <p>Please verify your email address to complete your registration:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verifyUrl}" style="display: inline-block; background-color: #10B981; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
+              Verify My Email
+            </a>
+          </div>
+          <div style="background-color: #F0FDF4; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10B981;">
+            <p style="margin: 0; color: #166534;">⏰ This link expires in <strong>24 hours</strong>.</p>
+          </div>
+          <p style="color: #6B7280; font-size: 14px;">If the button doesn't work, copy this link: <span style="color: #10B981; word-break: break-all;">${verifyUrl}</span></p>
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #E5E7EB;">
+          <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
+        </div>
+      `
+    });
+    console.log('✅ Verification email sent to:', userEmail);
+  } catch (error) {
+    console.error('❌ Error sending verification email:', error);
+  }
+};
+
 module.exports = {
   sendApplicationNotification,
   sendStatusUpdateNotification,
   sendJobDeletionNotification,
   sendAccountDeletionNotification,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendVerificationEmail
 };

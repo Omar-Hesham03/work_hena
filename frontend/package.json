@@ -47,6 +47,7 @@
     "@tailwindcss/postcss": "^4.1.18",
     "@types/dompurify": "^3.0.5",
     "autoprefixer": "^10.4.23",
+    "cypress": "^15.15.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17"
   }

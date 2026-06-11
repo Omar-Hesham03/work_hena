@@ -12,6 +12,7 @@ import SavedJobs from './pages/SavedJobs';
 import AdminDashboard from './pages/AdminDashboard';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
 function App() {
   return (
     <Router>
@@ -39,6 +40,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
           </Routes>
         </>
       </div>

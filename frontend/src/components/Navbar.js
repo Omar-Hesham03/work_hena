@@ -9,6 +9,7 @@ import CreditCounter from './CreditCounter';
 import PremiumUpgradeModal from './PremiumUpgradeModal';
 import CreditPurchaseModal from './CreditPurchaseModal';
 import { getCreditBalance } from '../services/api';
+import VerificationBanner from './VerificationBanner';
 
 function Navbar() {
     const { user, logout } = useContext(AuthContext);
@@ -112,7 +113,7 @@ function Navbar() {
                     </div>
                 </div>
             </nav>
-
+            <VerificationBanner />
             {/* Global Modals */}
             {user && user.user_type === 'job_seeker' && (
                 <PremiumUpgradeModal

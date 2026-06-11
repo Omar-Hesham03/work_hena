@@ -47,8 +47,8 @@ function ViewProfile() {
           <div className="flex items-center gap-4">
             <DarkModeToggle />
             <NotificationBell />
-            <button 
-              onClick={() => navigate(-1)} 
+            <button
+              onClick={() => navigate(-1)}
               className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
             >
               ← Back
@@ -63,7 +63,7 @@ function ViewProfile() {
           <h1 className="text-4xl font-bold mb-2">{user.full_name}</h1>
           <p className="text-blue-100 dark:text-blue-200 text-lg mb-4">{user.email}</p>
           {user.phone && <p className="text-blue-100 dark:text-blue-200">📞 {user.phone}</p>}
-          
+
           {profile && (
             <div className="mt-4 flex flex-wrap gap-4">
               {profile.location && (
@@ -161,9 +161,9 @@ function ViewProfile() {
                   {profile.portfolio_links.map((item, index) => (
                     <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition">
                       <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">{item.title}</h3>
-                      <a 
-                        href={item.url} 
-                        target="_blank" 
+                      <a
+                        href={item.url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary dark:text-blue-400 hover:underline break-all"
                       >
@@ -183,9 +183,9 @@ function ViewProfile() {
               <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Links & Contact</h2>
               <div className="space-y-3">
                 {profile.resume_link && (
-                  <a 
-                    href={profile.resume_link} 
-                    target="_blank" 
+                  <a
+                    href={profile.resume_link}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 text-primary dark:text-blue-400 hover:underline"
                   >
@@ -194,9 +194,9 @@ function ViewProfile() {
                   </a>
                 )}
                 {profile.linkedin_url && (
-                  <a 
-                    href={profile.linkedin_url} 
-                    target="_blank" 
+                  <a
+                    href={profile.linkedin_url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 text-primary dark:text-blue-400 hover:underline"
                   >
@@ -205,9 +205,9 @@ function ViewProfile() {
                   </a>
                 )}
                 {profile.github_url && (
-                  <a 
-                    href={profile.github_url} 
-                    target="_blank" 
+                  <a
+                    href={profile.github_url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 text-primary dark:text-blue-400 hover:underline"
                   >
@@ -216,9 +216,9 @@ function ViewProfile() {
                   </a>
                 )}
                 {profile.website_url && (
-                  <a 
-                    href={profile.website_url} 
-                    target="_blank" 
+                  <a
+                    href={profile.website_url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 text-primary dark:text-blue-400 hover:underline"
                   >

@@ -63,7 +63,7 @@ function CreditPurchaseModal({ isOpen, onClose, currentBalance, isFirstPurchase 
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-green-500 to-blue-600 dark:from-green-700 dark:to-blue-800 text-white p-6 rounded-t-2xl">
                     <button

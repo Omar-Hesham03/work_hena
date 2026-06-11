@@ -31,6 +31,7 @@ function VerifyEmail() {
                 const user = JSON.parse(storedUser);
                 user.email_verified = true;
                 localStorage.setItem('user', JSON.stringify(user));
+                window.dispatchEvent(new Event('user-updated'));
             }
         } catch (error) {
             setStatus('error');

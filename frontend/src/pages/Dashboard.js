@@ -1,12 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, Suspense, lazy } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import RecruiterDashboard from '../components/RecruiterDashboard';
-import JobSeekerDashboard from '../components/JobSeekerDashboard';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
+const RecruiterDashboard = lazy(() => import('../components/RecruiterDashboard'));
+const JobSeekerDashboard = lazy(() => import('../components/JobSeekerDashboard'));
+
 function Dashboard() {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
 
@@ -26,13 +27,13 @@ function Dashboard() {
 
       {/* Dashboard Content */}
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
-
-
-        {user.user_type === 'recruiter' ? (
-          <RecruiterDashboard />
-        ) : (
-          <JobSeekerDashboard />
-        )}
+        <Suspense fallback={<div className="p-6 text-center text-gray-600 dark:text-gray-400">Loading dashboard...</div>}>
+          {user.user_type === 'recruiter' ? (
+            <RecruiterDashboard />
+          ) : (
+            <JobSeekerDashboard />
+          )}
+        </Suspense>
       </div>
 
       {/* Credit Purchase Modal */}

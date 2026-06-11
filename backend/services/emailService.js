@@ -3,12 +3,23 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
+const sendEmail = async (payload, successMessage) => {
+  const result = await resend.emails.send(payload);
+
+  if (result.error) {
+    throw new Error(result.error.message || 'Failed to send email');
+  }
+
+  console.log(successMessage, result.data?.id ? `(${result.data.id})` : '');
+  return result;
+};
+
 // ============================================
 // APPLICATION NOTIFICATION
 // ============================================
 const sendApplicationNotification = async (recruiterEmail, recruiterName, jobTitle, candidateName, candidateEmail) => {
   try {
-    await resend.emails.send({
+    await sendEmail({
       from: 'WorkHena <onboarding@resend.dev>',
       to: recruiterEmail,
       subject: `New Application for ${jobTitle}`,
@@ -30,10 +41,10 @@ const sendApplicationNotification = async (recruiterEmail, recruiterName, jobTit
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
       `
-    });
-    console.log('✅ Application notification email sent to recruiter');
+    }, '✅ Application notification email sent to recruiter');
   } catch (error) {
     console.error('❌ Error sending application notification:', error);
+    throw error;
   }
 };
 
@@ -53,7 +64,7 @@ const sendStatusUpdateNotification = async (candidateEmail, candidateName, jobTi
   };
 
   try {
-    await resend.emails.send({
+    await sendEmail({
       from: 'WorkHena <onboarding@resend.dev>',
       to: candidateEmail,
       subject: `Application Update: ${jobTitle}`,
@@ -78,10 +89,10 @@ const sendStatusUpdateNotification = async (candidateEmail, candidateName, jobTi
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
       `
-    });
-    console.log('✅ Status update email sent to candidate');
+    }, '✅ Status update email sent to candidate');
   } catch (error) {
     console.error('❌ Error sending status update email:', error);
+    throw error;
   }
 };
 
@@ -90,7 +101,7 @@ const sendStatusUpdateNotification = async (candidateEmail, candidateName, jobTi
 // ============================================
 const sendJobDeletionNotification = async (recruiterEmail, recruiterName, jobTitle, companyName, reason) => {
   try {
-    await resend.emails.send({
+    await sendEmail({
       from: 'WorkHena <onboarding@resend.dev>',
       to: recruiterEmail,
       subject: `Job Posting Removed: ${jobTitle}`,
@@ -112,10 +123,10 @@ const sendJobDeletionNotification = async (recruiterEmail, recruiterName, jobTit
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
       `
-    });
-    console.log('✅ Job deletion notification sent to recruiter');
+    }, '✅ Job deletion notification sent to recruiter');
   } catch (error) {
     console.error('❌ Error sending job deletion notification:', error);
+    throw error;
   }
 };
 
@@ -124,7 +135,7 @@ const sendJobDeletionNotification = async (recruiterEmail, recruiterName, jobTit
 // ============================================
 const sendAccountDeletionNotification = async (userEmail, userName, reason) => {
   try {
-    await resend.emails.send({
+    await sendEmail({
       from: 'WorkHena <onboarding@resend.dev>',
       to: userEmail,
       subject: 'WorkHena Account Termination Notice',
@@ -142,10 +153,10 @@ const sendAccountDeletionNotification = async (userEmail, userName, reason) => {
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
       `
-    });
-    console.log('✅ Account deletion notification sent to user');
+    }, '✅ Account deletion notification sent to user');
   } catch (error) {
     console.error('❌ Error sending account deletion notification:', error);
+    throw error;
   }
 };
 
@@ -154,7 +165,7 @@ const sendAccountDeletionNotification = async (userEmail, userName, reason) => {
 // ============================================
 const sendPasswordResetEmail = async (userEmail, userName, resetUrl) => {
   try {
-    await resend.emails.send({
+    await sendEmail({
       from: 'WorkHena <onboarding@resend.dev>',
       to: userEmail,
       subject: 'Reset Your WorkHena Password',
@@ -176,10 +187,10 @@ const sendPasswordResetEmail = async (userEmail, userName, resetUrl) => {
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
       `
-    });
-    console.log('✅ Password reset email sent to:', userEmail);
+    }, `✅ Password reset email sent to: ${userEmail}`);
   } catch (error) {
     console.error('❌ Error sending password reset email:', error);
+    throw error;
   }
 };
 
@@ -188,7 +199,7 @@ const sendPasswordResetEmail = async (userEmail, userName, resetUrl) => {
 // ============================================
 const sendVerificationEmail = async (userEmail, userName, verifyUrl) => {
   try {
-    await resend.emails.send({
+    await sendEmail({
       from: 'WorkHena <onboarding@resend.dev>',
       to: userEmail,
       subject: 'Verify Your WorkHena Email',
@@ -210,10 +221,10 @@ const sendVerificationEmail = async (userEmail, userName, verifyUrl) => {
           <p style="color: #6B7280; font-size: 14px;">WorkHena - Connecting talent with opportunity</p>
         </div>
       `
-    });
-    console.log('✅ Verification email sent to:', userEmail);
+    }, `✅ Verification email sent to: ${userEmail}`);
   } catch (error) {
     console.error('❌ Error sending verification email:', error);
+    throw error;
   }
 };
 

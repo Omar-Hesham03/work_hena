@@ -31,6 +31,16 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
 
   const firstName = user.full_name.split(' ')[0];
   const userTypeDisplay = user.user_type === 'recruiter' ? '[Recruiter]' : user.user_type === 'admin' ? '[Admin]' : '[Freelancer]';
+  const isVerified = Boolean(user.email_verified);
+  const verificationBadge = isVerified
+    ? {
+        label: 'Verified',
+        className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+      }
+    : {
+        label: 'Unverified',
+        className: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800'
+      };
 
   const handleNavigation = (path) => {
     setShowDropdown(false);
@@ -73,7 +83,21 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
                 <AvatarDisplay avatarId={user.avatar} size="md" />
                 <div>
                   <p className="font-bold text-gray-800 dark:text-gray-100">{firstName}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{userTypeDisplay}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{userTypeDisplay}</p>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${verificationBadge.className}`}>
+                      {isVerified ? (
+                        <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707a1 1 0 00-1.414-1.414L9 11.172 7.707 9.879a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 7a1.25 1.25 0 100-2.5A1.25 1.25 0 0010 14z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      {verificationBadge.label}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

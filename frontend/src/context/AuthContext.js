@@ -9,8 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if user is logged in on mount
+  const syncUserFromStorage = () => {
     const storedToken = getCookie('token');
     const storedUser = localStorage.getItem('user');
 
@@ -18,10 +17,28 @@ export const AuthProvider = ({ children }) => {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
     } else {
-      // If token is missing (expired/cleared), clean up user data
+      setToken(null);
+      setUser(null);
       localStorage.removeItem('user');
     }
+  };
+
+  useEffect(() => {
+    // Check if user is logged in on mount
+    syncUserFromStorage();
     setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const handleUserUpdated = () => {
+      syncUserFromStorage();
+    };
+
+    window.addEventListener('user-updated', handleUserUpdated);
+
+    return () => {
+      window.removeEventListener('user-updated', handleUserUpdated);
+    };
   }, []);
 
   const login = async (email, password, rememberMe = false) => {
@@ -33,6 +50,8 @@ export const AuthProvider = ({ children }) => {
 
     // Store user info in localStorage (for quick access, insensitive data)
     localStorage.setItem('user', JSON.stringify(user));
+
+    window.dispatchEvent(new Event('user-updated'));
 
     setToken(token);
     setUser(user);
@@ -48,6 +67,8 @@ export const AuthProvider = ({ children }) => {
     setCookie('token', token, null);
     localStorage.setItem('user', JSON.stringify(user));
 
+    window.dispatchEvent(new Event('user-updated'));
+
     setToken(token);
     setUser(user);
 
@@ -59,6 +80,7 @@ export const AuthProvider = ({ children }) => {
     const updatedUser = response.data.user;
 
     localStorage.setItem('user', JSON.stringify(updatedUser));
+    window.dispatchEvent(new Event('user-updated'));
     setUser(updatedUser);
 
     return response.data;

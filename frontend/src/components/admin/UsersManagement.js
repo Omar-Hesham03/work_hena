@@ -9,6 +9,9 @@ function UsersManagement() {
     user_type: 'all',
     search: ''
   });
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [userToUpdate, setUserToUpdate] = useState(null);
+  const [deleteReason, setDeleteReason] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -31,30 +34,36 @@ function UsersManagement() {
     }
   };
 
-  const handleDeleteUser = async (userId, userName) => {
-    const confirmed = window.confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`);
-    if (!confirmed) return;
+  const handleDeleteUser = (user) => {
+    setUserToDelete(user);
+    setDeleteReason('');
+  };
 
-    // Ask for reason
-    const reason = prompt(`Please provide a reason for terminating ${userName}'s account (optional):`);
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
 
     try {
-      await deleteUser(userId, reason || undefined);
-      toast.success(reason ? 'User deleted and notified! 📧' : 'User deleted! 🗑️');
+      await deleteUser(userToDelete.id, deleteReason.trim() || undefined);
+      toast.success(deleteReason.trim() ? 'User deleted and notified! 📧' : 'User deleted! 🗑️');
+      setUserToDelete(null);
+      setDeleteReason('');
       fetchUsers();
     } catch (error) {
       toast.error('Error deleting user: ' + (error.response?.data?.error || error.message));
     }
   };
 
-  const handleUpdateUserType = async (userId, newType, userName) => {
-    if (!window.confirm(`Change ${userName} to ${newType}?`)) {
-      return;
-    }
+  const handleUpdateUserType = (user, newType) => {
+    setUserToUpdate({ ...user, newType });
+  };
+
+  const confirmUpdateUserType = async () => {
+    if (!userToUpdate) return;
 
     try {
-      await updateUserType(userId, newType);
+      await updateUserType(userToUpdate.id, userToUpdate.newType);
       toast.success('User type updated! ✅');
+      setUserToUpdate(null);
       fetchUsers();
     } catch (error) {
       toast.error('Error updating user: ' + (error.response?.data?.error || error.message));
@@ -124,7 +133,7 @@ function UsersManagement() {
                       <td className="px-6 py-4">
                         <select
                           value={user.user_type}
-                          onChange={(e) => handleUpdateUserType(user.id, e.target.value, user.full_name)}
+                          onChange={(e) => handleUpdateUserType(user, e.target.value)}
                           className="px-3 py-1 rounded-full text-xs font-semibold border-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"
                         >
                           <option value="job_seeker">Job Seeker</option>
@@ -143,7 +152,7 @@ function UsersManagement() {
                       </td>
                       <td className="px-6 py-4">
                         <button
-                          onClick={() => handleDeleteUser(user.id, user.full_name)}
+                          onClick={() => handleDeleteUser(user)}
                           className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-semibold"
                         >
                           Delete
@@ -180,6 +189,83 @@ function UsersManagement() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {userToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 transition-colors shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-xl font-bold">
+                !
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Delete User?</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone.</p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-4 mb-5 border border-gray-200 dark:border-gray-700">
+              <p className="text-gray-700 dark:text-gray-300 text-sm mb-1">You’re about to delete:</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">{userToDelete.full_name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{userToDelete.email}</p>
+            </div>
+
+            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Reason (optional)</label>
+            <textarea
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+              rows="3"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 mb-5"
+              placeholder="Why are you removing this account?"
+            />
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setUserToDelete(null);
+                  setDeleteReason('');
+                }}
+                className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteUser}
+                className="px-5 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-semibold"
+              >
+                Delete User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Type Update Confirmation Modal */}
+      {userToUpdate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 transition-colors shadow-2xl">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">Update User Type?</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-5">
+              Change <span className="font-semibold">{userToUpdate.full_name}</span> to <span className="font-semibold capitalize">{userToUpdate.newType}</span>?
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setUserToUpdate(null)}
+                className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmUpdateUserType}
+                className="px-5 py-2.5 rounded-lg bg-primary text-white hover:bg-blue-600 transition font-semibold"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

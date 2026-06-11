@@ -13,6 +13,20 @@ function CreditCounter({ onPurchaseClick }) {
         }
     }, [user]);
 
+    useEffect(() => {
+        const handleCreditsUpdated = () => {
+            if (user && user.user_type === 'recruiter') {
+                fetchBalance();
+            }
+        };
+
+        window.addEventListener('credits-updated', handleCreditsUpdated);
+
+        return () => {
+            window.removeEventListener('credits-updated', handleCreditsUpdated);
+        };
+    }, [user]);
+
     const fetchBalance = async () => {
         try {
             const response = await getCreditBalance();

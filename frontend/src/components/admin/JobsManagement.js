@@ -10,6 +10,9 @@ function JobsManagement() {
     status: 'all',
     search: ''
   });
+  const [jobToDelete, setJobToDelete] = useState(null);
+  const [jobToUpdate, setJobToUpdate] = useState(null);
+  const [deleteReason, setDeleteReason] = useState('');
 
   useEffect(() => {
     fetchJobs();
@@ -32,30 +35,36 @@ function JobsManagement() {
     }
   };
 
-  const handleDeleteJob = async (jobId, jobTitle) => {
-    const confirmed = window.confirm(`Are you sure you want to delete "${jobTitle}"? This action cannot be undone.`);
-    if (!confirmed) return;
+  const handleDeleteJob = (job) => {
+    setJobToDelete(job);
+    setDeleteReason('');
+  };
 
-    // Ask for reason
-    const reason = prompt(`Please provide a reason for removing "${jobTitle}" (optional):`);
+  const confirmDeleteJob = async () => {
+    if (!jobToDelete) return;
 
     try {
-      await deleteAdminJob(jobId, reason || undefined);
-      toast.success(reason ? 'Job deleted and recruiter notified! 📧' : 'Job deleted! 🗑️');
+      await deleteAdminJob(jobToDelete.id, deleteReason.trim() || undefined);
+      toast.success(deleteReason.trim() ? 'Job deleted and recruiter notified! 📧' : 'Job deleted! 🗑️');
+      setJobToDelete(null);
+      setDeleteReason('');
       fetchJobs();
     } catch (error) {
       toast.error('Error deleting job: ' + (error.response?.data?.error || error.message));
     }
   };
 
-  const handleUpdateStatus = async (jobId, newStatus, jobTitle) => {
-    if (!window.confirm(`Change "${jobTitle}" status to ${newStatus}?`)) {
-      return;
-    }
+  const handleUpdateStatus = (job, newStatus) => {
+    setJobToUpdate({ ...job, newStatus });
+  };
+
+  const confirmUpdateStatus = async () => {
+    if (!jobToUpdate) return;
 
     try {
-      await updateJobStatus(jobId, newStatus);
+      await updateJobStatus(jobToUpdate.id, jobToUpdate.newStatus);
       toast.success('Job status updated! ✅');
+      setJobToUpdate(null);
       fetchJobs();
     } catch (error) {
       toast.error('Error updating job: ' + (error.response?.data?.error || error.message));
@@ -130,7 +139,7 @@ function JobsManagement() {
 
                   <select
                     value={job.status}
-                    onChange={(e) => handleUpdateStatus(job.id, e.target.value, job.title)}
+                    onChange={(e) => handleUpdateStatus(job, e.target.value)}
                     className={`px-3 py-1 rounded-full text-xs font-semibold border-2 ${getStatusColor(job.status)}`}
                   >
                     <option value="open">Open</option>
@@ -152,7 +161,7 @@ function JobsManagement() {
                   </div>
 
                   <button
-                    onClick={() => handleDeleteJob(job.id, job.title)}
+                    onClick={() => handleDeleteJob(job)}
                     className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition font-semibold"
                   >
                     Delete Job
@@ -186,6 +195,83 @@ function JobsManagement() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {jobToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 transition-colors shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-xl font-bold">
+                !
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Delete Job?</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone.</p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-4 mb-5 border border-gray-200 dark:border-gray-700">
+              <p className="text-gray-700 dark:text-gray-300 text-sm mb-1">You’re about to delete:</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">{jobToDelete.title}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{jobToDelete.company}</p>
+            </div>
+
+            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Reason (optional)</label>
+            <textarea
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+              rows="3"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 mb-5"
+              placeholder="Why are you removing this job?"
+            />
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setJobToDelete(null);
+                  setDeleteReason('');
+                }}
+                className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteJob}
+                className="px-5 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-semibold"
+              >
+                Delete Job
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Status Update Confirmation Modal */}
+      {jobToUpdate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 transition-colors shadow-2xl">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">Update Status?</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-5">
+              Change <span className="font-semibold">{jobToUpdate.title}</span> status to <span className="font-semibold capitalize">{jobToUpdate.newStatus}</span>?
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setJobToUpdate(null)}
+                className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmUpdateStatus}
+                className="px-5 py-2.5 rounded-lg bg-primary text-white hover:bg-blue-600 transition font-semibold"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -39,7 +39,10 @@ module.exports = (supabase) => {
             phone: phone || null,
             company_name: company_name || null,
             avatar: null,
-            email_verified: false
+            email_verified: false,
+            credits: user_type === 'recruiter' ? 10 : 0,
+            total_credits_purchased: 0,
+            first_credit_purchase: false
           }
         ])
         .select()
@@ -55,9 +58,9 @@ module.exports = (supabase) => {
         .from('email_verification_tokens')
         .insert([{ user_id: data.id, token, expires_at: expiresAt.toISOString() }]);
 
-      // Send verification email (non-blocking)
+      // Send verification email
       const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
-      sendVerificationEmail(data.email, data.full_name, verifyUrl);
+      await sendVerificationEmail(data.email, data.full_name, verifyUrl);
 
       const jwtToken = jwt.sign(
         { userId: data.id, email: data.email, user_type: data.user_type },

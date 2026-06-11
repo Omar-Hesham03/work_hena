@@ -11,6 +11,7 @@ function RecruiterDashboard() {
     const [jobs, setJobs] = useState([]);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
+    const [jobToDelete, setJobToDelete] = useState(null);
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchParams] = useSearchParams();
@@ -68,6 +69,7 @@ function RecruiterDashboard() {
                 requirements: ''
             });
             fetchMyJobs();
+            window.dispatchEvent(new Event('credits-updated'));
             toast.success('Job posted successfully! 🎉');
         } catch (error) {
             const errorMessage = error.response?.data?.error || error.message;
@@ -80,15 +82,20 @@ function RecruiterDashboard() {
         }
     };
 
-    const handleDeleteJob = async (jobId) => {
-        if (window.confirm('Are you sure you want to delete this job?')) {
-            try {
-                await deleteJob(jobId);
-                fetchMyJobs();
-                toast.success('Job deleted! 🗑️');
-            } catch (error) {
-                toast.error('Error deleting job: ' + (error.response?.data?.error || error.message));
-            }
+    const handleDeleteJob = (job) => {
+        setJobToDelete(job);
+    };
+
+    const confirmDeleteJob = async () => {
+        if (!jobToDelete) return;
+
+        try {
+            await deleteJob(jobToDelete.id);
+            fetchMyJobs();
+            setJobToDelete(null);
+            toast.success('Job deleted successfully! 🗑️');
+        } catch (error) {
+            toast.error('Error deleting job: ' + (error.response?.data?.error || error.message));
         }
     };
 
@@ -275,7 +282,7 @@ function RecruiterDashboard() {
                                                 View Applications
                                             </button>
                                             <button
-                                                onClick={() => handleDeleteJob(job.id)}
+                                                onClick={() => handleDeleteJob(job)}
                                                 className="flex-1 sm:flex-none px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition text-sm"
                                             >
                                                 Delete
@@ -304,6 +311,44 @@ function RecruiterDashboard() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+
+                    {/* Delete Confirmation Modal */}
+                    {jobToDelete && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 transition-colors shadow-2xl">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-xl font-bold">
+                                        !
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Delete Job?</h2>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone.</p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-4 mb-5 border border-gray-200 dark:border-gray-700">
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm mb-1">You’re about to delete:</p>
+                                    <p className="font-semibold text-gray-900 dark:text-gray-100">{jobToDelete.title}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{jobToDelete.company}</p>
+                                </div>
+
+                                <div className="flex gap-3 justify-end">
+                                    <button
+                                        onClick={() => setJobToDelete(null)}
+                                        className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmDeleteJob}
+                                        className="px-5 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-semibold"
+                                    >
+                                        Delete Job
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
 

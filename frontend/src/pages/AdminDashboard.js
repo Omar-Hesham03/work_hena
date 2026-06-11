@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { getAdminStats, getAdminActivity } from '../services/api';
 import NotificationBell from '../components/NotificationBell';
 import DarkModeToggle from '../components/DarkModeToggle';
 import ProfileDropdown from '../components/ProfileDropdown';
-import UsersManagement from '../components/admin/UsersManagement';
-import JobsManagement from '../components/admin/JobsManagement';
-import ApplicationsManagement from '../components/admin/ApplicationsManagement';
 import { toast } from 'sonner';
+
+const UsersManagement = lazy(() => import('../components/admin/UsersManagement'));
+const JobsManagement = lazy(() => import('../components/admin/JobsManagement'));
+const ApplicationsManagement = lazy(() => import('../components/admin/ApplicationsManagement'));
 function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -165,9 +166,13 @@ function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === 'users' && <UsersManagement />}
-        {activeTab === 'jobs' && <JobsManagement />}
-        {activeTab === 'applications' && <ApplicationsManagement />}
+        {activeTab !== 'overview' && (
+          <Suspense fallback={<div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center text-gray-600 dark:text-gray-400">Loading section...</div>}>
+            {activeTab === 'users' && <UsersManagement />}
+            {activeTab === 'jobs' && <JobsManagement />}
+            {activeTab === 'applications' && <ApplicationsManagement />}
+          </Suspense>
+        )}
       </div>
     </div>
   );

@@ -16,6 +16,8 @@ function Profile() {
   const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isNavigationBlocked, setIsNavigationBlocked] = useState(false);
+  const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
+  const [pendingNavigationAction, setPendingNavigationAction] = useState(null);
 
   const [profile, setProfile] = useState({
     bio: '',
@@ -72,16 +74,15 @@ function Profile() {
 
     const confirmNavigation = (callback, ...args) => {
       if (hasUnsavedChanges) {
-        const shouldProceed = window.confirm(
-          'You have unsaved changes. Do you want to leave without saving?'
-        );
-        if (shouldProceed) {
+        setPendingNavigationAction(() => () => {
           setHasUnsavedChanges(false);
           setTimeout(() => callback.apply(navigator, args), 0);
-        }
-      } else {
-        callback.apply(navigator, args);
+        });
+        setShowUnsavedChangesModal(true);
+        return;
       }
+
+      callback.apply(navigator, args);
     };
 
     navigator.push = (...args) => confirmNavigation(originalPush, ...args);
@@ -114,10 +115,11 @@ function Profile() {
 
   const handleLogoutWithWarning = () => {
     if (hasUnsavedChanges) {
-      if (window.confirm('You have unsaved changes. Do you want to logout without saving?')) {
+      setPendingNavigationAction(() => () => {
         setHasUnsavedChanges(false);
         logout();
-      }
+      });
+      setShowUnsavedChangesModal(true);
     } else {
       logout();
     }
@@ -125,13 +127,11 @@ function Profile() {
 
   const handleNavigationWithWarning = (path) => {
     if (hasUnsavedChanges) {
-      const shouldProceed = window.confirm(
-        'You have unsaved changes. Do you want to leave without saving?'
-      );
-      if (shouldProceed) {
+      setPendingNavigationAction(() => () => {
         setHasUnsavedChanges(false);
         setTimeout(() => navigate(path), 0);
-      }
+      });
+      setShowUnsavedChangesModal(true);
     } else {
       navigate(path);
     }
@@ -316,6 +316,49 @@ function Profile() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
+
+            {showUnsavedChangesModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-2xl transition-colors">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-300 text-xl font-bold">
+                      !
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Unsaved Changes</h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">You have changes that haven’t been saved yet.</p>
+                    </div>
+                  </div>
+
+                  <p className="text-gray-700 dark:text-gray-300 mb-5">
+                    If you leave now, your latest edits will be lost.
+                  </p>
+
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      onClick={() => {
+                        setShowUnsavedChangesModal(false);
+                        setPendingNavigationAction(null);
+                      }}
+                      className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
+                    >
+                      Stay Here
+                    </button>
+                    <button
+                      onClick={() => {
+                        const action = pendingNavigationAction;
+                        setShowUnsavedChangesModal(false);
+                        setPendingNavigationAction(null);
+                        if (action) action();
+                      }}
+                      className="px-5 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-semibold"
+                    >
+                      Leave Without Saving
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
               <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Location</label>
               <input
                 type="text"

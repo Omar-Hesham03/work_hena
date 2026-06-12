@@ -58,9 +58,13 @@ module.exports = (supabase) => {
         .from('email_verification_tokens')
         .insert([{ user_id: data.id, token, expires_at: expiresAt.toISOString() }]);
 
-      // Send verification email
+      // Send verification email (best-effort — don't fail registration if email fails)
       const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
-      await sendVerificationEmail(data.email, data.full_name, verifyUrl);
+      try {
+        await sendVerificationEmail(data.email, data.full_name, verifyUrl);
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError.message);
+      }
 
       const jwtToken = jwt.sign(
         { userId: data.id, email: data.email, user_type: data.user_type },
@@ -244,7 +248,12 @@ module.exports = (supabase) => {
         .insert([{ user_id: userId, token, expires_at: expiresAt.toISOString() }]);
 
       const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
-      await sendVerificationEmail(user.email, user.full_name, verifyUrl);
+      try {
+        await sendVerificationEmail(user.email, user.full_name, verifyUrl);
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError.message);
+        return res.status(500).json({ error: 'Failed to send verification email. Please try again later.' });
+      }
 
       res.json({ message: 'Verification email sent!' });
 
@@ -289,10 +298,15 @@ module.exports = (supabase) => {
         .insert([{ user_id: user.id, token, expires_at: expiresAt.toISOString() }]);
 
       const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
-      await sendPasswordResetEmail(user.email, user.full_name, resetUrl);
+
+      // Best-effort — don't fail the request if email sending fails
+      try {
+        await sendPasswordResetEmail(user.email, user.full_name, resetUrl);
+      } catch (emailError) {
+        console.error('Failed to send password reset email:', emailError.message);
+      }
 
       res.json({ message: 'If that email exists, a reset link has been sent.' });
-
     } catch (error) {
       console.error('Forgot password error:', error);
       res.status(500).json({ error: 'Failed to process request' });

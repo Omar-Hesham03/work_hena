@@ -3,7 +3,11 @@ const router = express.Router();
 const { authenticateToken, isAdmin } = require('../middleware/auth');
 
 module.exports = (supabase) => {
-
+    // Strip characters that have special meaning in PostgREST .or() filter syntax
+    const sanitizeSearchTerm = (str) => {
+        if (!str) return '';
+        return str.replace(/[,()]/g, '');
+    };
     // Get all users with pagination
     router.get('/users', authenticateToken, isAdmin, async (req, res) => {
         try {
@@ -21,7 +25,8 @@ module.exports = (supabase) => {
 
             // Search by name or email
             if (search) {
-                query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`);
+                const safeSearch = sanitizeSearchTerm(search);
+                query = query.or(`full_name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`);
             }
 
             query = query
@@ -226,7 +231,8 @@ module.exports = (supabase) => {
             }
 
             if (search) {
-                query = query.or(`title.ilike.%${search}%,company.ilike.%${search}%`);
+                const safeSearch = sanitizeSearchTerm(search);
+                query = query.or(`title.ilike.%${safeSearch}%,company.ilike.%${safeSearch}%`);
             }
 
             query = query

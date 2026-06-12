@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getCookie } from '../utils/cookieUtils';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Create axios instance
 const api = axios.create({

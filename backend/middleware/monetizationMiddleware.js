@@ -175,7 +175,7 @@ const checkApplicationLimit = async (req, res, next) => {
 /**
  * Increment application counter after successful application
  */
-const incrementApplicationCount = async (userId) => {
+const incrementApplicationCount = async (userId, jobId) => {
     try {
         // userId is UUID
         await pool.query(
@@ -183,11 +183,11 @@ const incrementApplicationCount = async (userId) => {
             [userId]
         );
 
-        // Also record in application_history (userId is UUID)
+        // Also record in application_history (userId and jobId are UUIDs)
         await pool.query(
             `INSERT INTO application_history (user_id, job_id, application_date, subscription_tier)
-       SELECT $1::uuid, $2, CURRENT_DATE, subscription_tier FROM users WHERE id = $1::uuid`,
-            [userId, null] // job_id will be updated in the main application route
+       SELECT $1::uuid, $2::uuid, CURRENT_DATE, subscription_tier FROM users WHERE id = $1::uuid`,
+            [userId, jobId]
         );
 
         console.log(`Application count incremented for user ${userId}`);

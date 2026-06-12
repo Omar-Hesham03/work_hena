@@ -402,9 +402,10 @@ router.post('/webhook/paymob', async (req, res) => {
         const { success, order, amount_cents, id: transactionId } = data;
 
         if (success && success === 'true') {
-            // Extract payment ID from merchant order ID
+            // Extract payment ID from merchant order ID (format: type_paymentId_timestamp)
             const merchantOrderId = order.merchant_order_id;
-            const paymentId = parseInt(merchantOrderId.split('-')[2]); // Format: type-userId-paymentId
+            const orderParts = merchantOrderId.split('_');
+            const paymentId = orderParts[1];
 
             // Get payment details
             const paymentResult = await pool.query('SELECT * FROM payments WHERE id = $1::uuid', [paymentId]);
@@ -416,7 +417,7 @@ router.post('/webhook/paymob', async (req, res) => {
 
             // Update payment status
             await pool.query(
-                'UPDATE payments SET status = $1, paymob_transaction_id = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+                'UPDATE payments SET status = $1, paymob_transaction_id = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3::uuid',
                 ['completed', transactionId, paymentId]
             );
 
@@ -431,10 +432,11 @@ router.post('/webhook/paymob', async (req, res) => {
         } else {
             // Payment failed
             const merchantOrderId = order.merchant_order_id;
-            const paymentId = parseInt(merchantOrderId.split('-')[2]);
+            const orderParts = merchantOrderId.split('_');
+            const paymentId = orderParts[1];
 
             await pool.query(
-                'UPDATE payments SET status = $1 WHERE id = $2',
+                'UPDATE payments SET status = $1 WHERE id = $2::uuid',
                 ['failed', paymentId]
             );
 
@@ -474,14 +476,14 @@ async function processSubscriptionPayment(payment) {
         await client.query(
             `UPDATE users 
        SET subscription_tier = $1, subscription_expires_at = $2 
-       WHERE id = $3`,
+       WHERE id = $3::uuid`,
             ['premium', endDate, payment.user_id]
         );
 
         // Record subscription history
         await client.query(
             `INSERT INTO subscription_history (user_id, plan_id, start_date, end_date, is_renewal, payment_id)
-       VALUES ($1::uuid, $2, $3::uuid, $4, $5, $6)`,
+       VALUES ($1::uuid, $2::uuid, $3, $4, $5, $6::uuid)`,
             [payment.user_id, payment.plan_id, startDate, endDate, !metadata.is_first_time, payment.id]
         );
 
@@ -512,14 +514,14 @@ async function processCreditPayment(payment) {
        SET credits = $1, 
            total_credits_purchased = total_credits_purchased + $2,
            first_credit_purchase = true
-       WHERE id = $3`,
+       WHERE id = $3::uuid`,
             [newBalance, payment.credits, payment.user_id]
         );
 
         // Record credit transaction
         await client.query(
             `INSERT INTO credit_transactions (user_id, type, amount, balance_after, description, related_payment_id)
-       VALUES ($1::uuid, $2, $3::uuid, $4, $5, $6)`,
+       VALUES ($1::uuid, $2, $3, $4, $5, $6::uuid)`,
             [
                 payment.user_id,
                 'purchase',

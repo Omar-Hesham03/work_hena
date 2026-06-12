@@ -83,8 +83,7 @@ class PaymobService {
             const amountCents = Math.round(amountEGP * 100);
 
             // Generate unique order ID
-            const orderId = `${orderData.type}-${user.id}-${Date.now()}`;
-
+            const orderId = `${orderData.type}_${orderData.paymentId}_${Date.now()}`;
             // Step 1: Authenticate
             const authToken = await this.authenticate();
 
@@ -203,8 +202,7 @@ class PaymobService {
     async getWalletPaymentUrl(user, amountEGP, phoneNumber, orderData) {
         try {
             const amountCents = Math.round(amountEGP * 100);
-            const orderId = `wallet-${user.id}-${Date.now()}`;
-
+            const orderId = `wallet_${orderData.paymentId}_${Date.now()}`;
             const authToken = await this.authenticate();
             const order = await this.registerOrder(authToken, amountCents, orderId);
 

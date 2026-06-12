@@ -44,11 +44,16 @@ module.exports = (supabase) => {
                 .select()
                 .single();
 
-            if (error) throw error;
+            if (error) {
+                // 23505 = unique_violation (from the unique_job_candidate constraint)
+                if (error.code === '23505') {
+                    return res.status(400).json({ error: 'You have already applied to this job' });
+                }
+                throw error;
+            }
 
             // Increment application usage count
-            await incrementApplicationCount(req.user.userId);
-
+            await incrementApplicationCount(req.user.userId, job_id);
             // Get job and recruiter info
             const { data: job } = await supabase
                 .from('jobs')

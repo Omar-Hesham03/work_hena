@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 
-// TODO: Replace these with your real AdSense values
-const ADSENSE_CLIENT = 'ca-pub-XXXXXXXXXX'; // Your publisher ID
-const ADSENSE_SLOT = 'XXXXXXXXXX';          // Your ad slot ID
+// Set REACT_APP_ADSENSE_CLIENT and REACT_APP_ADSENSE_SLOT in your .env when ready
+const ADSENSE_CLIENT = process.env.REACT_APP_ADSENSE_CLIENT || 'ca-pub-XXXXXXXXXX';
+const ADSENSE_SLOT = process.env.REACT_APP_ADSENSE_SLOT || 'XXXXXXXXXX';
 
 function NativeAd() {
     const adRef = useRef(null);

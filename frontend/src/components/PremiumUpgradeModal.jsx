@@ -224,6 +224,8 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Mastercard</span>
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Vodafone Cash</span>
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Etisalat Cash</span>
+                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Orange Cash</span>
+                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">WE Pay</span>
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">InstaPay</span>
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Fawry</span>
                     </div>

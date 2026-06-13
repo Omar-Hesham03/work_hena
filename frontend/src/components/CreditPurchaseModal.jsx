@@ -92,10 +92,10 @@ function CreditPurchaseModal({ isOpen, onClose, currentBalance, isFirstPurchase 
                         <div>
                             <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2">How Credits Work:</h3>
                             <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
-                                <li>• <strong>Job Post = 5 credits</strong> (~5 EGP per post)</li>
-                                <li>• Credits never expire and roll over each month</li>
-                                <li>• Access "Find Candidates" feature as long as credits &gt; 0</li>
-                                <li>• Buy credits anytime - no subscription required</li>
+                                <li>• <strong>Job Post = 5 credits.</strong></li>
+                                <li>• Credits never expire and roll over each month.</li>
+                                <li>• Access "Find Candidates" feature as long as you got credits.</li>
+                                <li>• Buy credits anytime - no subscription required.</li>
                             </ul>
                         </div>
                     </div>
@@ -114,7 +114,7 @@ function CreditPurchaseModal({ isOpen, onClose, currentBalance, isFirstPurchase 
                             const jobPosts = Math.floor(pkg.credits / 5);
 
                             // Highlight the most popular package
-                            const isPopular = pkg.name === 'Starter';
+                            const isPopular = pkg.name === 'Pro';
 
                             return (
                                 <div
@@ -146,10 +146,6 @@ function CreditPurchaseModal({ isOpen, onClose, currentBalance, isFirstPurchase 
                                         <div className="flex justify-between text-gray-700 dark:text-gray-300">
                                             <span>Job Posts:</span>
                                             <span className="font-semibold">~{jobPosts}</span>
-                                        </div>
-                                        <div className="flex justify-between text-gray-700 dark:text-gray-300">
-                                            <span>Value:</span>
-                                            <span className="font-semibold">{creditsPerEGP} credits/EGP</span>
                                         </div>
                                     </div>
 
@@ -210,6 +206,8 @@ function CreditPurchaseModal({ isOpen, onClose, currentBalance, isFirstPurchase 
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Mastercard</span>
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Vodafone Cash</span>
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Etisalat Cash</span>
+                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Orange Cash</span>
+                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">WE Pay</span>
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">InstaPay</span>
                         <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Fawry</span>
                     </div>

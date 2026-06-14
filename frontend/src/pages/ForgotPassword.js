@@ -37,8 +37,7 @@ function ForgotPassword() {
             <div className="max-w-md w-full">
                 <div className="text-center mb-8">
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{tr('Forgot Password?', 'نسيت الباسورد؟')}</h2>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">{tr('No worries, we'll send you a reset link', 'ماتقلقش، هنابعتلك لينك لإعادة التعيين')}</p>
-                </div>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">{tr("No worries, we'll send you a reset link", 'ماتقلقش، هنابعتلك لينك لإعادة التعيين')}</p>                </div>
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8 transition-colors">
                     {sent ? (

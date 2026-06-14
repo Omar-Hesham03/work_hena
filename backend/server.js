@@ -6,10 +6,23 @@ require('dotenv').config();
 const monetizationRoutes = require('./routes/monetizationRoutes');
 const initCronJobs = require('./utils/cronJobs');
 
+const isProduction = process.env.NODE_ENV === 'production';
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URLS,
+  !isProduction ? 'http://localhost:3000' : null,
+  !isProduction ? 'http://127.0.0.1:3000' : null
+]
+  .flatMap((value) => (value ? value.split(',') : []))
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 // Initialize Cron Jobs
 initCronJobs();
 
 const app = express();
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
 
 // Initialize Supabase
 const supabase = createClient(
@@ -29,7 +42,9 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", process.env.SUPABASE_URL],
+      connectSrc: ["'self'", process.env.SUPABASE_URL].filter(Boolean),
+      frameAncestors: ["'none'"],
+      baseUri: ["'self'"],
     },
   },
   crossOriginEmbedderPolicy: false,
@@ -37,23 +52,34 @@ app.use(helmet({
     maxAge: 31536000,
     includeSubDomains: true,
     preload: true
-  }
+  },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
 
 // 2. CORS Configuration
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.FRONTEND_URL || 'https://yourproductionurl.com'
-    : 'http://localhost:3000',
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+app.use(cors(corsOptions));
 
 // 3. Body Parser with Size Limits (prevent large payload attacks)
-app.use(express.json({ limit: '10mb' })); // Limit JSON payload to 10MB
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // 4. Import Rate Limiters
 const {

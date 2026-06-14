@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { login as loginAPI, register as registerAPI, updateUserAvatar } from '../services/api';
 import { setCookie, getCookie, deleteCookie } from '../utils/cookieUtils';
 
@@ -9,25 +9,32 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const syncUserFromStorage = () => {
+  const syncUserFromStorage = useCallback(() => {
     const storedToken = getCookie('token');
     const storedUser = localStorage.getItem('user');
 
     if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      try {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        deleteCookie('token');
+        localStorage.removeItem('user');
+        setToken(null);
+        setUser(null);
+      }
     } else {
       setToken(null);
       setUser(null);
       localStorage.removeItem('user');
     }
-  };
+  }, []);
 
   useEffect(() => {
     // Check if user is logged in on mount
     syncUserFromStorage();
     setLoading(false);
-  }, []);
+  }, [syncUserFromStorage]);
 
   useEffect(() => {
     const handleUserUpdated = () => {
@@ -39,9 +46,9 @@ export const AuthProvider = ({ children }) => {
     return () => {
       window.removeEventListener('user-updated', handleUserUpdated);
     };
-  }, []);
+  }, [syncUserFromStorage]);
 
-  const login = async (email, password, rememberMe = false) => {
+  const login = useCallback(async (email, password, rememberMe = false) => {
     const response = await loginAPI({ email, password });
     const { token, user } = response.data;
 
@@ -57,9 +64,9 @@ export const AuthProvider = ({ children }) => {
     setUser(user);
 
     return response.data;
-  };
+  }, []);
 
-  const register = async (userData) => {
+  const register = useCallback(async (userData) => {
     const response = await registerAPI(userData);
     const { token, user } = response.data;
 
@@ -73,9 +80,9 @@ export const AuthProvider = ({ children }) => {
     setUser(user);
 
     return response.data;
-  };
+  }, []);
 
-  const updateAvatar = async (avatar) => {
+  const updateAvatar = useCallback(async (avatar) => {
     const response = await updateUserAvatar(avatar);
     const updatedUser = response.data.user;
 
@@ -84,17 +91,20 @@ export const AuthProvider = ({ children }) => {
     setUser(updatedUser);
 
     return response.data;
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     deleteCookie('token');
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
-  };
+    window.dispatchEvent(new Event('user-updated'));
+  }, []);
+
+  const value = useMemo(() => ({ user, token, login, register, logout, updateAvatar, loading }), [user, token, login, register, logout, updateAvatar, loading]);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, updateAvatar, loading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

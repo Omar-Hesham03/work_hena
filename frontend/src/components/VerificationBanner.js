@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 import api from '../services/api';
 
 function VerificationBanner() {
     const { user } = useContext(AuthContext);
+    const { t } = useLanguage();
     const [dismissed, setDismissed] = useState(false);
     const [sending, setSending] = useState(false);
 
@@ -15,7 +17,7 @@ function VerificationBanner() {
         setSending(true);
         try {
             await api.post('/auth/resend-verification');
-            toast.success('Verification email sent! Check your inbox 📧');
+            toast.success(t('verification.sending'));
         } catch (error) {
             toast.error(error.response?.data?.error || 'Failed to send email');
         } finally {
@@ -28,7 +30,7 @@ function VerificationBanner() {
             <div className="container mx-auto px-4 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
                     <span>⚠️</span>
-                    <span>Please verify your email address to get the most out of WorkHena.</span>
+                    <span>{t('verification.message')}</span>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                     <button
@@ -36,7 +38,7 @@ function VerificationBanner() {
                         disabled={sending}
                         className="text-sm font-semibold text-yellow-800 dark:text-yellow-200 underline hover:no-underline disabled:opacity-50"
                     >
-                        {sending ? 'Sending...' : 'Resend email'}
+                        {sending ? t('verification.sending') : t('verification.resend')}
                     </button>
                     <button
                         onClick={() => setDismissed(true)}

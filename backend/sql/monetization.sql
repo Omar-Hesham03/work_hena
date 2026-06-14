@@ -29,8 +29,9 @@ CREATE TABLE IF NOT EXISTS subscription_plans (
 
 -- Insert Job Seeker Plans
 INSERT INTO subscription_plans (name, user_type, duration_months, price_egp, first_time_price_egp, features) VALUES
-('Premium (First Time)', 'job_seeker', 3, 179, 149, '{"daily_applications": 40, "ads": false, "premium_badge": true, "priority_search": true}'),
-('Premium (Renewal)', 'job_seeker', 3, 179, NULL, '{"daily_applications": 40, "ads": false, "premium_badge": true, "priority_search": true}')
+('Starter', 'job_seeker', 1, 99, NULL, '{"daily_applications": 20, "ads": false, "premium_badge": true, "priority_search": false}'),
+('Pro', 'job_seeker', 3, 279, NULL, '{"daily_applications": 20, "ads": false, "premium_badge": true, "priority_search": true}'),
+('Pro-Plus', 'job_seeker', 6, 549, NULL, '{"daily_applications": 20, "ads": false, "premium_badge": true, "priority_search": true, "boosted_visibility": true}')
 ON CONFLICT DO NOTHING;
 
 -- 3. Credit Packages Table

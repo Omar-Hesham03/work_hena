@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getSubscriptionPlans, purchaseSubscription } from '../services/api';
 import { toast } from 'sonner';
+import { useLanguage } from '../context/LanguageContext';
 
 function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
     const [plans, setPlans] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState(null);
+    const { t, language } = useLanguage();
+    const tr = (en, ar) => (language === 'ar' ? ar : en);
 
     useEffect(() => {
         if (isOpen) {
@@ -77,49 +80,96 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
     if (!isOpen) return null;
 
     const isPremium = currentTier === 'premium';
+    const formatDurationLabel = (months) => (months === 1 ? tr('1 month', 'شهر واحد') : tr(`${months} months`, `${months} أشهر`));
+    const formatPlanTitle = (plan) => `${plan.name || tr('Plan', 'الخطة')} · ${formatDurationLabel(plan.duration_months)}`;
+    const getPlanHighlights = (plan) => {
+        const features = plan.features || {};
+        const highlights = [
+            `${features.daily_applications || 20} applications/day`,
+            features.priority_search ? 'Priority search boost' : 'Standard search visibility',
+            features.premium_badge ? 'Premium badge' : null,
+            features.ads === false ? 'No ads' : null
+        ].filter(Boolean);
+
+        return highlights;
+    };
+
+    const featuredPlanId = plans.find((plan) => plan.duration_months === 3)?.id;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                {/* Header - Removed sticky top-0 to fix scrolling issue */}
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white p-6 rounded-t-2xl relative">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <div
+                className="bg-white dark:bg-slate-900 rounded-[28px] shadow-[0_30px_80px_rgba(15,23,42,0.45)] max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-slate-200/70 dark:border-slate-700/60"
+                onClick={(event) => event.stopPropagation()}
+            >
+                <div className="relative overflow-hidden rounded-t-[28px] bg-[radial-gradient(circle_at_top_left,_rgba(96,165,250,0.35),_transparent_40%),linear-gradient(135deg,_#0f172a_0%,_#1d4ed8_45%,_#7c3aed_100%)] text-white p-6 sm:p-8">
+                    <div className="absolute inset-0 opacity-20 bg-[linear-gradient(115deg,rgba(255,255,255,0.14)_0%,rgba(255,255,255,0)_35%,rgba(255,255,255,0.12)_70%,rgba(255,255,255,0)_100%)]" />
+                    <div className="relative flex items-start justify-between gap-6">
+                        <div className="max-w-2xl">
+                            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-100">
+                                {t('premium.heroTag')}
+                            </div>
+                            <h2 className="mt-4 text-3xl sm:text-4xl font-black tracking-tight">
+                                {t('premium.heroTitle')}
+                            </h2>
+                            <p className="mt-3 max-w-xl text-sm sm:text-base text-blue-50/90 leading-relaxed">
+                                {t('premium.heroSubtitle')}
+                            </p>
+                        </div>
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 text-white hover:bg-white/20 rounded-full p-1 transition"
+                        className="rounded-full p-2 text-white/90 transition hover:bg-white/15 hover:text-white"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    <h2 className="text-3xl font-bold mb-2">
-                        {isPremium ? '⭐ Manage Your Premium' : '🚀 Upgrade to Premium'}
-                    </h2>
-                    <p className="text-blue-100">
-                        {isPremium
-                            ? 'Your premium subscription is active!'
-                            : 'Unlock unlimited applications and premium features'
-                        }
-                    </p>
+                    </div>
+
+                    {!isPremium && (
+                        <div className="relative mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="rounded-2xl bg-white/10 border border-white/10 px-4 py-3 backdrop-blur-sm">
+                                <p className="text-xs uppercase tracking-[0.16em] text-blue-100/70">{t('premium.summaryFree')}</p>
+                                <p className="mt-1 text-lg font-bold">{t('premium.summaryFreeValue')}</p>
+                            </div>
+                            <div className="rounded-2xl bg-white text-slate-900 px-4 py-3 shadow-lg shadow-black/10">
+                                <p className="text-xs uppercase tracking-[0.16em] text-blue-700/70">{t('premium.summaryPremium')}</p>
+                                <p className="mt-1 text-lg font-extrabold text-blue-700">{t('premium.summaryPremiumValue')}</p>
+                            </div>
+                            <div className="rounded-2xl bg-white/10 border border-white/10 px-4 py-3 backdrop-blur-sm">
+                                <p className="text-xs uppercase tracking-[0.16em] text-blue-100/70">{t('premium.summaryAccess')}</p>
+                                <p className="mt-1 text-lg font-bold">{t('premium.summaryAccessValue')}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Features */}
                 {!isPremium && (
-                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
-                            ✨ Premium Features
-                        </h3>
+                    <div className="p-6 sm:p-8 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/30">
+                        <div className="flex items-center justify-between gap-4 mb-5">
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
+                                {t('premium.featuresTitle')}
+                            </h3>
+                            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-600 dark:text-blue-400">
+                                {t('premium.featuresNote')}
+                            </span>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[
-                                { icon: '🚀', text: '40 Applications Daily', subtext: 'vs. 10 on free plan' },
-                                { icon: '🚫', text: 'Zero Ads', subtext: 'Clean browsing experience' },
-                                { icon: '⭐', text: 'Premium Badge', subtext: 'Stand out to recruiters' },
-                                { icon: '🏆', text: 'Top of Search', subtext: 'Appear first in candidate searches' }
+                                { icon: '🚀', text: tr('20 Applications Daily', '20 طلب يوميًا'), subtext: tr('vs. 5 on free plan', 'مقابل 5 في الخطة المجانية') },
+                                { icon: '🚫', text: tr('Zero Ads', 'من غير إعلانات'), subtext: tr('Clean browsing experience', 'تجربة تصفح أنضف') },
+                                { icon: '⭐', text: tr('Premium Badge', 'بادج بريميوم'), subtext: tr('Stand out to recruiters', 'تميّز أمام جهات التوظيف') },
+                                { icon: '🏆', text: tr('Top of Search', 'أول الظهور في البحث'), subtext: tr('Appear first in candidate searches', 'يظهر أولًا في بحث المرشحين') }
                             ].map((feature, idx) => (
-                                <div key={idx} className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                                    <span className="text-2xl">{feature.icon}</span>
+                                <div key={idx} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+                                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-2xl dark:bg-slate-800">{feature.icon}</span>
                                     <div>
-                                        <p className="font-semibold text-gray-800 dark:text-gray-100">{feature.text}</p>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">{feature.subtext}</p>
+                                        <p className="font-semibold text-slate-900 dark:text-slate-100">{feature.text}</p>
+                                        <p className="text-sm leading-snug text-slate-600 dark:text-slate-400">{feature.subtext}</p>
                                     </div>
                                 </div>
                             ))}
@@ -128,106 +178,141 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
                 )}
 
                 {/* Plans */}
-                <div className="p-6">
-                    {/* <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
-                        {isPremium ? '📅 Renew Subscription' : '💎 Choose Your Plan'}
-                    </h3> */}
-                    <div className="space-y-4">
+                <div className="p-6 sm:p-8">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+                        {isPremium ? `📅 ${t('premium.renewSubscription')}` : `💎 ${t('premium.choosePlan')}`}
+                    </h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         {plans.map((plan) => {
                             const isFirstTime = plan.is_first_time_offer;
                             const price = plan.final_price;
                             const originalPrice = plan.original_price;
                             const savings = plan.savings;
                             const pricePerMonth = (price / plan.duration_months).toFixed(0);
+                            const durationLabel = formatDurationLabel(plan.duration_months);
+                            const isFeatured = plan.id === featuredPlanId;
+                            const highlights = getPlanHighlights(plan);
 
                             return (
                                 <div
                                     key={plan.id}
-                                    className={`border-2 rounded-xl p-4 sm:p-6 transition ${isFirstTime
-                                        ? 'border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-900/20'
-                                        : 'border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-600'
+                                    className={`relative flex h-full flex-col rounded-3xl border p-5 sm:p-6 transition duration-300 ${isFeatured
+                                        ? 'border-blue-500 bg-gradient-to-b from-blue-50 to-white shadow-[0_18px_40px_rgba(59,130,246,0.18)] dark:border-blue-500 dark:from-slate-900 dark:to-slate-950'
+                                        : isFirstTime
+                                            ? 'border-emerald-500 bg-emerald-50/60 shadow-sm dark:border-emerald-600 dark:bg-emerald-900/20'
+                                            : 'border-slate-200 bg-white shadow-sm hover:-translate-y-1 hover:border-blue-400 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/70 dark:hover:border-blue-500'
                                         }`}
                                 >
-                                    {/* Mobile-first: Stack vertically */}
-                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
+                                    <div className="flex flex-1 flex-col">
+                                        <div className="flex items-start justify-between gap-4">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                                                    {plan.duration_months} Months
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <h4 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                                                    {formatPlanTitle(plan)}
                                                 </h4>
+                                                {isFeatured && (
+                                                    <span className="rounded-full bg-blue-600 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-white shadow-sm">
+                                                        {t('premium.bestValue')}
+                                                    </span>
+                                                )}
                                                 {isFirstTime && (
-                                                    <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                                        FIRST TIME OFFER
+                                                    <span className="rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-white shadow-sm">
+                                                        {t('premium.firstTimeOffer')}
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                ~{pricePerMonth} EGP per month
+                                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                                                {tr(`${durationLabel} of premium access with a cleaner, faster workflow.`, `وصول بريميوم لمدة ${durationLabel} مع تجربة أسرع وأنضف.`)}
+                                            </p>
+                                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                                {plan.duration_months === 1
+                                                    ? `${pricePerMonth} EGP for ${durationLabel}`
+                                                    : `~${pricePerMonth} EGP per month`
+                                                }
                                             </p>
                                         </div>
 
-                                        {/* Price - Centered on mobile, right-aligned on desktop */}
-                                        <div className="text-center sm:text-right">
-                                            <div className="text-3xl sm:text-4xl font-bold text-primary dark:text-blue-400">
-                                                {parseFloat(price).toFixed(2)}
+                                        <div className="text-right">
+                                            <div className="text-4xl font-black tracking-tight text-blue-600 dark:text-blue-400">
+                                                {parseFloat(price).toFixed(0)}
                                             </div>
-                                            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                                                 EGP
                                             </div>
-                                            {isFirstTime && originalPrice > price && (
-                                                <div className="text-sm text-gray-500 dark:text-gray-400 line-through mt-1">
-                                                    {parseFloat(originalPrice).toFixed(2)} EGP
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
 
-                                    <button
-                                        onClick={() => handlePurchase(plan.id)}
-                                        disabled={loading && selectedPlan === plan.id}
-                                        className={`w-full py-3 rounded-lg font-semibold transition ${isFirstTime
-                                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                                            : 'bg-primary dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white'
-                                            } disabled:opacity-50`}
-                                    >
-                                        {loading && selectedPlan === plan.id ? (
-                                            <span className="flex items-center justify-center gap-2">
-                                                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Processing...
-                                            </span>
-                                        ) : (
-                                            `Purchase for ${parseFloat(price).toFixed(2)} EGP`
-                                        )}
-                                    </button>
+                                        <ul className="mt-5 space-y-2">
+                                            {highlights.map((item) => (
+                                                <li key={item} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">✓</span>
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
 
-                                    {isFirstTime && savings > 0 && (
-                                        <p className="text-xs text-center text-gray-600 dark:text-gray-400 mt-2">
-                                            💡 Save {parseFloat(savings).toFixed(2)} EGP on your first purchase!
-                                        </p>
-                                    )}
+                                        <div className="mt-auto pt-5">
+                                            <div className="rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/60 dark:text-slate-400">
+                                                Premium access lasts for <span className="font-bold text-slate-900 dark:text-white">{durationLabel}</span> {t('premium.durationSuffix')}.
+                                            </div>
+
+                                            <button
+                                                onClick={() => handlePurchase(plan.id)}
+                                                disabled={loading && selectedPlan === plan.id}
+                                                className={`mt-5 w-full rounded-2xl py-3.5 font-semibold transition ${isFeatured
+                                                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20 hover:from-blue-700 hover:to-indigo-700'
+                                                    : isFirstTime
+                                                        ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                                                        : 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700'
+                                                    } disabled:opacity-60 disabled:cursor-not-allowed`}
+                                            >
+                                                {loading && selectedPlan === plan.id ? (
+                                                    <span className="flex items-center justify-center gap-2">
+                                                        <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        {tr('Processing...', 'جاري المعالجة...')}
+                                                    </span>
+                                                ) : (
+                                                    tr(`Purchase for ${parseFloat(price).toFixed(0)} EGP`, `اشترِ بـ ${parseFloat(price).toFixed(0)} جنيه`)
+                                                )}
+                                            </button>
+
+                                            {isFirstTime && savings > 0 && (
+                                                <p className="mt-3 text-center text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                                                    Save {parseFloat(savings).toFixed(0)} EGP on your first purchase.
+                                                </p>
+                                            )}
+                                            {isFirstTime && originalPrice > price && (
+                                                <p className="mt-1 text-center text-xs text-slate-500 line-through dark:text-slate-400">
+                                                    {parseFloat(originalPrice).toFixed(0)} EGP
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             );
                         })}
+                        {!plans.length && (
+                            <div className="col-span-full text-center py-8 text-slate-600 dark:text-slate-400">
+                                {tr('No subscription plans are available right now.', 'لا توجد خطط اشتراك متاحة الآن.')}
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Payment Methods */}
-                <div className="p-6 bg-gray-50 dark:bg-gray-900 rounded-b-2xl">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 text-center">
-                        💳 We accept all major payment methods:
+                <div className="rounded-b-[28px] border-t border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-950">
+                    <p className="mb-3 text-center text-sm text-slate-600 dark:text-slate-400">
+                        {t('premium.paymentMethods')}
                     </p>
-                    <div className="flex flex-wrap justify-center gap-2 text-xs text-gray-500 dark:text-gray-500">
-                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Visa</span>
-                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Mastercard</span>
-                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Vodafone Cash</span>
-                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Etisalat Cash</span>
-                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Orange Cash</span>
-                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">WE Pay</span>
-                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">InstaPay</span>
-                        <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full">Fawry</span>
+                    <div className="flex flex-wrap justify-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {['Visa', 'Mastercard', 'Vodafone Cash', 'Etisalat Cash', 'Orange Cash', 'WE Pay', 'InstaPay', 'Fawry'].map((method) => (
+                            <span key={method} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                                {method}
+                            </span>
+                        ))}
                     </div>
                 </div>
             </div>

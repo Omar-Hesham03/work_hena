@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getMyApplications } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 
 function JobSeekerDashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const tr = (en, ar) => (language === 'ar' ? ar : en);
 
   useEffect(() => {
     fetchMyApplications();
@@ -35,19 +38,19 @@ function JobSeekerDashboard() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">My Applications</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">{tr('My Applications', 'طلباتي')}</h1>
       </div>
 
       {loading ? (
-        <p className="text-gray-600 dark:text-gray-400">Loading your applications...</p>
+        <p className="text-gray-600 dark:text-gray-400">{tr('Loading your applications...', 'جاري تحميل طلباتك...')}</p>
       ) : applications.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 sm:p-8 text-center transition-colors">
-          <p className="text-gray-600 dark:text-gray-400 mb-4">You haven't applied to any jobs yet.</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{tr("You haven't applied to any jobs yet.", 'ماقدمتش على أي وظيفة لسه.')}</p>
           <button 
             onClick={() => navigate('/')}
             className="w-full sm:w-auto px-6 py-3 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition"
           >
-            Start Browsing Jobs
+            {tr('Start Browsing Jobs', 'ابدأ استعراض الوظايف')}
           </button>
         </div>
       ) : (
@@ -62,7 +65,7 @@ function JobSeekerDashboard() {
                   
                   {app.cover_letter && (
                     <div className="mt-3">
-                      <p className="font-semibold text-gray-700 dark:text-gray-300">Your Cover Letter:</p>
+                      <p className="font-semibold text-gray-700 dark:text-gray-300">{tr('Your Cover Letter:', 'خطاب التقديم بتاعك:')}</p>
                       <p className="text-gray-600 dark:text-gray-400 text-sm">{app.cover_letter}</p>
                     </div>
                   )}
@@ -74,12 +77,12 @@ function JobSeekerDashboard() {
                       rel="noopener noreferrer"
                       className="text-primary dark:text-blue-400 hover:underline mt-2 inline-block text-sm"
                     >
-                      📄 View Your Resume
+                      📄 {tr('View Your Resume', 'عرض السيرة الذاتية')}
                     </a>
                   )}
                   
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-3">
-                    Applied: {new Date(app.created_at).toLocaleDateString()}
+                    {tr('Applied:', 'تم التقديم:')} {new Date(app.created_at).toLocaleDateString()}
                   </p>
                 </div>
                 
@@ -92,7 +95,7 @@ function JobSeekerDashboard() {
               
               {app.notes && (
                 <div className="mt-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors">
-                  <p className="font-semibold text-gray-700 dark:text-gray-300 text-sm sm:text-base">Recruiter Notes:</p>
+                  <p className="font-semibold text-gray-700 dark:text-gray-300 text-sm sm:text-base">{tr('Recruiter Notes:', 'ملاحظات جهة التوظيف:')}</p>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">{app.notes}</p>
                 </div>
               )}
@@ -106,7 +109,7 @@ function JobSeekerDashboard() {
             onClick={() => navigate('/')}
             className="px-6 py-3 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold"
           >
-            Browse More Jobs
+            {tr('Browse More Jobs', 'تصفح وظائف أكثر')}
           </button>
         </div>
       </>

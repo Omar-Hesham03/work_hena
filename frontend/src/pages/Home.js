@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getAllJobs, saveJob, unsaveJob, checkIfJobSaved, getRecommendedJobs, getSubscriptionStatus } from '../services/api';
 import { getMyProfile } from '../services/api';
 import NotificationBell from '../components/NotificationBell';
@@ -11,6 +12,10 @@ import ApplicationCounter from '../components/ApplicationCounter';
 import NativeAd from '../components/NativeAd';
 import { toast } from 'sonner';
 import Navbar from '../components/Navbar';
+import { Helmet } from 'react-helmet-async';
+
+const SITE_NAME = 'WorkHena';
+const PUBLIC_URL = process.env.REACT_APP_PUBLIC_URL || '';
 
 // Helper function for match badge colors
 const getMatchLevel = (percentage) => {
@@ -24,6 +29,7 @@ function Home() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, logout, loading: authLoading } = useContext(AuthContext);
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const showAIFeatures = user && user.user_type === 'job_seeker';
@@ -124,13 +130,14 @@ function Home() {
     if (!user || user.user_type !== 'job_seeker') return;
 
     try {
-      const savedIds = new Set();
-      for (const job of jobs) {
-        const response = await checkIfJobSaved(job.id);
-        if (response.data.isSaved) {
-          savedIds.add(job.id);
-        }
-      }
+      const savedResults = await Promise.all(
+        jobs.map(async (job) => {
+          const response = await checkIfJobSaved(job.id);
+          return response.data.isSaved ? job.id : null;
+        })
+      );
+
+      const savedIds = new Set(savedResults.filter(Boolean));
       setSavedJobIds(savedIds);
     } catch (error) {
       console.error('Error checking saved jobs:', error);
@@ -188,10 +195,37 @@ function Home() {
 
   const userTypeDisplay = user ? (user.user_type === 'recruiter' ? '[Recruiter]' : '[Freelancer]') : '';
   const firstName = user ? user.full_name.split(' ')[0] : '';
+  const canonical = `${PUBLIC_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/`;
 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <Helmet>
+        <title>WorkHena | Jobs, Hiring, and Career Growth</title>
+        <meta
+          name="description"
+          content="WorkHena helps job seekers find great jobs and recruiters hire faster with smart matching, saved jobs, and streamlined hiring tools."
+        />
+        <meta name="robots" content="index,follow" />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:title" content="WorkHena | Jobs, Hiring, and Career Growth" />
+        <meta
+          property="og:description"
+          content="WorkHena helps job seekers find great jobs and recruiters hire faster with smart matching, saved jobs, and streamlined hiring tools."
+        />
+        <meta property="og:url" content={canonical} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: SITE_NAME,
+            url: canonical
+          })}
+        </script>
+      </Helmet>
       {/* Navigation Bar */}
       {/* Navigation Bar */}
       <Navbar />
@@ -199,8 +233,8 @@ function Home() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white py-12 sm:py-20 transition-colors">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl sm:text-5xl font-bold mb-4">Find Your Dream Job</h1>
-          <p className="text-lg sm:text-xl">Connect with top companies and start your career journey today</p>
+          <h1 className="text-3xl sm:text-5xl font-bold mb-4">{t('home.heroTitle')}</h1>
+          <p className="text-lg sm:text-xl">{t('home.heroSubtitle')}</p>
         </div>
       </section>
 
@@ -212,13 +246,13 @@ function Home() {
             <div className="flex items-start gap-4">
               <span className="text-4xl">🤖</span>
               <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2">Get AI-Powered Job Recommendations!</h3>
-                <p className="mb-4">Complete your profile to unlock personalized job matches based on your skills, experience, and preferences.</p>
+                <h3 className="text-xl font-bold mb-2">{t('home.aiPromptTitle')}</h3>
+                <p className="mb-4">{t('home.aiPromptBody')}</p>
                 <button
                   onClick={() => navigate('/profile')}
                   className="px-6 py-3 bg-white text-purple-600 dark:text-purple-800 rounded-lg hover:bg-gray-100 transition font-semibold"
                 >
-                  Complete Your Profile
+                  {t('home.completeProfile')}
                 </button>
               </div>
             </div>
@@ -230,7 +264,7 @@ function Home() {
       <section className="container mx-auto px-4 py-6 sm:py-8">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6 transition-colors">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100">Search & Filter Jobs</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100">{t('home.searchTitle')}</h2>
 
             {/* Sort Toggle - Only show if AI features are enabled (setup pending for free users logic later maybe) */}
             {showAIFeatures && (
@@ -242,7 +276,7 @@ function Home() {
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                     }`}
                 >
-                  🤖 Recommended
+                  🤖 {t('home.recommended')}
                 </button>
                 <button
                   onClick={() => setSortBy('recent')}
@@ -251,7 +285,7 @@ function Home() {
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                     }`}
                 >
-                  🕒 Recent
+                  🕒 {t('home.recent')}
                 </button>
               </div>
             )}
@@ -261,7 +295,7 @@ function Home() {
             <div className="sm:col-span-2">
               <input
                 type="text"
-                placeholder="Search by title, company..."
+                placeholder={t('home.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -271,7 +305,7 @@ function Home() {
             <div>
               <input
                 type="text"
-                placeholder="Location..."
+                placeholder={t('home.locationPlaceholder')}
                 value={locationFilter}
                 onChange={(e) => setLocationFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -284,7 +318,7 @@ function Home() {
                 onChange={(e) => setJobTypeFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
-                <option value="">All Job Types</option>
+                <option value="">{t('home.jobTypePlaceholder')}</option>
                 <option value="full-time">Full-time</option>
                 <option value="part-time">Part-time</option>
                 <option value="contract">Contract</option>
@@ -298,7 +332,7 @@ function Home() {
                 onChange={(e) => setWorkModeFilter(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
-                <option value="">All Work Modes</option>
+                <option value="">{t('home.workModePlaceholder')}</option>
                 <option value="on-site">On-site</option>
                 <option value="remote">Remote</option>
                 <option value="hybrid">Hybrid</option>
@@ -315,7 +349,7 @@ function Home() {
                 onClick={clearFilters}
                 className="text-sm text-primary dark:text-blue-400 hover:underline"
               >
-                Clear all filters
+                {t('home.clearFilters')}
               </button>
             </div>
           )}
@@ -325,7 +359,7 @@ function Home() {
       {/* Jobs Listing */}
       <section className="container mx-auto px-4 pb-8 sm:pb-12">
         <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-gray-800 dark:text-gray-100">
-          {sortBy === 'recommended' && showAIFeatures ? '🤖 Recommended For You' : 'All Jobs'}
+          {sortBy === 'recommended' && showAIFeatures ? `🤖 ${t('home.recommendedForYou')}` : 'All Jobs'}
         </h2>
 
         {loading ? (
@@ -464,7 +498,7 @@ function Home() {
               disabled={loadingMore}
               className="px-8 py-3 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold disabled:opacity-50"
             >
-              {loadingMore ? 'Loading...' : `Load More Jobs(${currentPage} of ${totalPages})`}
+              {loadingMore ? 'Loading...' : `Load More Jobs (${currentPage} of ${totalPages})`}
             </button>
           </div>
         )}

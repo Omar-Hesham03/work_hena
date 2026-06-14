@@ -10,7 +10,7 @@ const pool = require('../config/database');
 const checkCreditsForJobPost = async (req, res, next) => {
     try {
         // Only apply to recruiters
-        if (req.user.user_type !== 'recruiter') {
+        if (!req.user || req.user.user_type !== 'recruiter') {
             return next();
         }
 
@@ -60,7 +60,14 @@ const deductCreditsForJobPost = async (jobId, userId) => {
 
         // Get current balance (userId is UUID string)
         const userResult = await client.query('SELECT credits FROM users WHERE id = $1::uuid', [userId]);
+        if (userResult.rows.length === 0) {
+            throw new Error('User not found');
+        }
+
         const currentCredits = userResult.rows[0].credits;
+        if (currentCredits < CREDITS_PER_JOB_POST) {
+            throw new Error('Insufficient credits');
+        }
         const newBalance = currentCredits - CREDITS_PER_JOB_POST;
 
         // Deduct credits (userId is UUID)
@@ -95,7 +102,7 @@ const deductCreditsForJobPost = async (jobId, userId) => {
 const checkApplicationLimit = async (req, res, next) => {
     try {
         // Only apply to job seekers
-        if (req.user.user_type !== 'job_seeker') {
+        if (!req.user || req.user.user_type !== 'job_seeker') {
             return next();
         }
 
@@ -128,9 +135,9 @@ const checkApplicationLimit = async (req, res, next) => {
         }
 
         // Reset counter if new day
-        const lastReset = new Date(user.last_application_reset);
+        const lastReset = user.last_application_reset ? new Date(user.last_application_reset) : null;
         const now = new Date();
-        const isNewDay = lastReset.toDateString() !== now.toDateString();
+        const isNewDay = !lastReset || Number.isNaN(lastReset.getTime()) || lastReset.toDateString() !== now.toDateString();
 
         let applicationsUsedToday = user.applications_used_today;
         if (isNewDay) {
@@ -142,14 +149,14 @@ const checkApplicationLimit = async (req, res, next) => {
         }
 
         // Check daily limit
-        const dailyLimit = subscriptionTier === 'premium' ? 40 : 10;
+        const dailyLimit = subscriptionTier === 'premium' ? 20 : 5;
 
         if (applicationsUsedToday >= dailyLimit) {
             return res.status(403).json({
                 error: 'Daily application limit reached',
                 message: subscriptionTier === 'premium'
-                    ? 'You have reached your daily limit of 40 applications. Please try again tomorrow.'
-                    : 'You have reached your daily limit of 10 applications. Upgrade to Premium for 40 applications per day!',
+                    ? 'You have reached your daily limit of 20 applications. Please try again tomorrow.'
+                    : 'You have reached your daily limit of 5 applications. Upgrade to Premium for 20 applications per day!',
                 dailyLimit,
                 used: applicationsUsedToday,
                 tier: subscriptionTier,
@@ -202,7 +209,7 @@ const incrementApplicationCount = async (userId, jobId) => {
  */
 const checkCandidateSearchAccess = async (req, res, next) => {
     try {
-        if (req.user.user_type !== 'recruiter') {
+        if (!req.user || req.user.user_type !== 'recruiter') {
             return res.status(403).json({
                 error: 'Only recruiters can search candidates'
             });

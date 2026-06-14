@@ -1,9 +1,15 @@
 const rateLimit = require('express-rate-limit');
 
-// General API rate limiter - relaxed for development (1000 requests per 15 minutes per IP)
+const isProduction = process.env.NODE_ENV === 'production';
+const readLimit = (value, fallback) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+// General API rate limiter - relaxed for development, stricter by default in production
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Increased for development - reduce to 100 in production
+  max: readLimit(process.env.API_RATE_LIMIT_MAX, isProduction ? 100 : 1000),
   message: {
     error: 'Too many requests from this IP, please try again later.'
   },
@@ -20,7 +26,7 @@ const apiLimiter = rateLimit({
 // TODO: TEMPORARILY BYPASSED FOR TESTING IN DEV. RE-ENABLE BEFORE PRODUCTION.
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 login/register attempts per windowMs
+  max: readLimit(process.env.AUTH_RATE_LIMIT_MAX, 5), // Limit each IP to login/register attempts per windowMs
   message: {
     error: 'Too many authentication attempts, please try again after 15 minutes.'
   },
@@ -33,7 +39,7 @@ const authLimiter = rateLimit({
 // TODO: TEMPORARILY BYPASSED FOR TESTING IN DEV. RE-ENABLE BEFORE PRODUCTION.
 const accountCreationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3,
+  max: readLimit(process.env.ACCOUNT_CREATION_RATE_LIMIT_MAX, 3),
   message: {
     error: 'Too many accounts created from this IP, please try again after an hour.'
   },
@@ -45,7 +51,7 @@ const accountCreationLimiter = rateLimit({
 // Rate limiter for job posting - 10 posts per hour (prevent spam)
 const jobPostingLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 15,
+  max: readLimit(process.env.JOB_POST_RATE_LIMIT_MAX, isProduction ? 10 : 15),
   message: {
     error: 'Too many jobs posted, please try again after an hour.'
   },
@@ -56,7 +62,7 @@ const jobPostingLimiter = rateLimit({
 // Rate limiter for job applications - 20 per day
 const applicationLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: 20,
+  max: readLimit(process.env.APPLICATION_RATE_LIMIT_MAX, 20),
   message: {
     error: 'Too many applications submitted today, please try again tomorrow.'
   },
@@ -67,7 +73,7 @@ const applicationLimiter = rateLimit({
 // Rate limiter for notification/invitation sending - 30 per hour
 const notificationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 30,
+  max: readLimit(process.env.NOTIFICATION_RATE_LIMIT_MAX, 30),
   message: {
     error: 'Too many invitations sent, please try again later.'
   },
@@ -78,7 +84,7 @@ const notificationLimiter = rateLimit({
 // Rate limiter for profile updates - 20 per hour
 const profileUpdateLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20,
+  max: readLimit(process.env.PROFILE_UPDATE_RATE_LIMIT_MAX, 20),
   message: {
     error: 'Too many profile updates, please try again later.'
   },

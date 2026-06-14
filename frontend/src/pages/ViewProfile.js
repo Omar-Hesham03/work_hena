@@ -4,6 +4,9 @@ import { getUserProfile } from '../services/api';
 import NotificationBell from '../components/NotificationBell';
 import DarkModeToggle from '../components/DarkModeToggle';
 import { toast } from 'sonner';
+import { Helmet } from 'react-helmet-async';
+
+const PUBLIC_URL = process.env.REACT_APP_PUBLIC_URL || '';
 function ViewProfile() {
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -14,6 +17,8 @@ function ViewProfile() {
   useEffect(() => {
     fetchProfile();
   }, [userId]);
+
+  const canonical = `${PUBLIC_URL || (typeof window !== 'undefined' ? window.location.origin : '')}/view-profile/${userId}`;
 
   const fetchProfile = async () => {
     try {
@@ -38,6 +43,23 @@ function ViewProfile() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <Helmet>
+        <title>{`Candidate Profile | WorkHena`}</title>
+        <meta
+          name="description"
+          content="View a candidate profile on WorkHena, including skills, experience, portfolio links, and contact details where available."
+        />
+        <meta name="robots" content="noindex,nofollow" />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="profile" />
+        <meta property="og:title" content="Candidate Profile | WorkHena" />
+        <meta
+          property="og:description"
+          content="View a candidate profile on WorkHena, including skills, experience, portfolio links, and contact details where available."
+        />
+        <meta property="og:url" content={canonical} />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Helmet>
       {/* Navigation */}
       <nav className="bg-white dark:bg-gray-800 shadow-md transition-colors">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">

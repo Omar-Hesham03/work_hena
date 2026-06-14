@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getCreditBalance } from '../services/api';
 
 function CreditCounter({ onPurchaseClick }) {
     const [balance, setBalance] = useState(null);
     const [loading, setLoading] = useState(true);
     const { user } = useContext(AuthContext);
+    const { t } = useLanguage();
 
     useEffect(() => {
         if (user && user.user_type === 'recruiter') {
@@ -48,7 +50,7 @@ function CreditCounter({ onPurchaseClick }) {
         <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
             {/* Credit Counter */}
             <div className="flex items-center gap-2">
-                <span className="hidden sm:inline text-xs font-bold text-gray-600 dark:text-gray-400">Credits:</span>
+                <span className="hidden sm:inline text-xs font-bold text-gray-600 dark:text-gray-400">{t('creditCounter.credits')}</span>
                 <span className={`text-sm font-bold ${credits <= 0
                     ? 'text-red-600 dark:text-red-400'
                     : credits <= 10
@@ -63,7 +65,7 @@ function CreditCounter({ onPurchaseClick }) {
             <button
                 onClick={onPurchaseClick}
                 className="flex items-center justify-center w-6 h-6 rounded-full bg-primary dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 transition"
-                title="Purchase Credits"
+                title={t('creditCounter.purchase')}
             >
                 <span className="text-lg font-bold leading-none pb-1">+</span>
             </button>

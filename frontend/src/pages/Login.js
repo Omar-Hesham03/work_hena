@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 import DarkModeToggle from '../components/DarkModeToggle';
 
@@ -15,6 +16,7 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const { login } = useContext(AuthContext);
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   // Real-time email validation
@@ -94,15 +96,15 @@ function Login() {
       </div>
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Welcome Back</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Sign in to your JobBoard account</p>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('login.title')}</h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">{t('login.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8 space-y-5 transition-colors">
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
+              {t('login.email')}
             </label>
             <input
               type="email"
@@ -124,10 +126,10 @@ function Login() {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
+                {t('login.password')}
               </label>
               <button type="button" onClick={() => navigate('/forgot-password')} className="text-sm text-primary dark:text-blue-400 hover:underline">
-                Forgot password?
+                {t('login.forgotPassword')}
               </button>
             </div>
             <div className="relative">
@@ -176,7 +178,7 @@ function Login() {
               )}
             </div>
             <label className="ml-2 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">
-              Keep me signed in
+              {t('login.rememberMe')}
             </label>
           </div>
 
@@ -186,17 +188,17 @@ function Login() {
             disabled={!isFormValid() || isSubmitting}
             className="w-full bg-primary dark:bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Signing In...' : 'Sign In'}
+            {isSubmitting ? t('login.signingIn') : t('login.signIn')}
           </button>
 
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?{' '}
+            {t('login.noAccount')}{' '}
             <button
               type="button"
               onClick={() => navigate('/register')}
               className="text-primary dark:text-blue-400 hover:underline font-semibold"
             >
-              Sign Up
+              {t('login.signUp')}
             </button>
           </p>
         </form>

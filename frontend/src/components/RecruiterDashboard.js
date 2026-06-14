@@ -6,6 +6,7 @@ import CandidateSearch from './CandidateSearch';
 import RichTextEditor from './RichTextEditor';
 import { toast } from 'sonner';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
+import { useLanguage } from '../context/LanguageContext';
 
 function RecruiterDashboard() {
     const [jobs, setJobs] = useState([]);
@@ -29,6 +30,8 @@ function RecruiterDashboard() {
         requirements: ''
     });
     const [expandedJobs, setExpandedJobs] = useState(new Set());
+    const { language } = useLanguage();
+    const tr = (en, ar) => (language === 'ar' ? ar : en);
     useEffect(() => {
         fetchMyJobs();
     }, []);
@@ -70,14 +73,14 @@ function RecruiterDashboard() {
             });
             fetchMyJobs();
             window.dispatchEvent(new Event('credits-updated'));
-            toast.success('Job posted successfully! 🎉');
+            toast.success(tr('Job posted successfully! 🎉', 'تم نشر الوظيفة بنجاح! 🎉'));
         } catch (error) {
             const errorMessage = error.response?.data?.error || error.message;
             const errorDetails = error.response?.data?.details;
             if (errorDetails && errorDetails.length > 0) {
                 toast.error(errorDetails[0]);
             } else {
-                toast.error('Error creating job: ' + errorMessage);
+                toast.error(tr('Error creating job: ', 'خطأ أثناء إنشاء الوظيفة: ') + errorMessage);
             }
         }
     };
@@ -93,9 +96,9 @@ function RecruiterDashboard() {
             await deleteJob(jobToDelete.id);
             fetchMyJobs();
             setJobToDelete(null);
-            toast.success('Job deleted successfully! 🗑️');
+            toast.success(tr('Job deleted successfully! 🗑️', 'تم حذف الوظيفة بنجاح! 🗑️'));
         } catch (error) {
-            toast.error('Error deleting job: ' + (error.response?.data?.error || error.message));
+            toast.error(tr('Error deleting job: ', 'خطأ أثناء حذف الوظيفة: ') + (error.response?.data?.error || error.message));
         }
     };
 
@@ -106,7 +109,7 @@ function RecruiterDashboard() {
             setApplications(response.data.applications);
         } catch (error) {
             console.error('Error fetching applications:', error);
-            toast.error('Error loading applications');
+            toast.error(tr('Error loading applications', 'خطأ في تحميل الطلبات'));
         }
     };
     const toggleJobExpansion = (jobId) => {
@@ -129,14 +132,14 @@ function RecruiterDashboard() {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                    {activeTab === 'my-jobs' ? 'My Job Posts' : 'Find Candidates'}
+                    {activeTab === 'my-jobs' ? tr('My Job Posts', 'وظايفي المنشورة') : tr('Find Candidates', 'ابحث عن مرشحين')}
                 </h1>
                 {activeTab === 'my-jobs' && (
                     <button
                         onClick={() => setShowCreateForm(!showCreateForm)}
                         className="px-6 py-3 bg-secondary dark:bg-green-600 text-white rounded-lg hover:bg-green-600 dark:hover:bg-green-700 transition font-semibold"
                     >
-                        {showCreateForm ? 'Cancel' : '+ Post New Job'}
+                        {showCreateForm ? tr('Cancel', 'إلغاء') : tr('+ Post New Job', '+ أنشر وظيفة جديدة')}
                     </button>
                 )}
             </div>
@@ -146,7 +149,7 @@ function RecruiterDashboard() {
                     {/* Create Job Form */}
                     {showCreateForm && (
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
-                            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Create New Job</h2>
+                            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Create New Job', 'إنشاء وظيفة جديدة')}</h2>
                             <form onSubmit={handleCreateJob}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>

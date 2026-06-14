@@ -2,13 +2,16 @@ import React, { useContext, Suspense, lazy } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { useLanguage } from '../context/LanguageContext';
 
 const RecruiterDashboard = lazy(() => import('../components/RecruiterDashboard'));
 const JobSeekerDashboard = lazy(() => import('../components/JobSeekerDashboard'));
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
+  const { language } = useLanguage();
   const navigate = useNavigate();
+  const tr = (en, ar) => (language === 'ar' ? ar : en);
 
 
   if (!user) {
@@ -27,7 +30,7 @@ function Dashboard() {
 
       {/* Dashboard Content */}
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
-        <Suspense fallback={<div className="p-6 text-center text-gray-600 dark:text-gray-400">Loading dashboard...</div>}>
+        <Suspense fallback={<div className="p-6 text-center text-gray-600 dark:text-gray-400">{tr('Loading dashboard...', 'جاري تحميل لوحة التحكم...')}</div>}>
           {user.user_type === 'recruiter' ? (
             <RecruiterDashboard />
           ) : (

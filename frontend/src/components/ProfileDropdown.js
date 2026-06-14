@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AvatarDisplay from './AvatarDisplay';
+import { useLanguage } from '../context/LanguageContext';
 
 function ProfileDropdown({ user, onLogout, onNavigate }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const { language, t } = useLanguage();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -30,7 +32,11 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
   }
 
   const firstName = user.full_name.split(' ')[0];
-  const userTypeDisplay = user.user_type === 'recruiter' ? '[Recruiter]' : user.user_type === 'admin' ? '[Admin]' : '[Freelancer]';
+  const userTypeDisplay = language === 'ar'
+    ? (user.user_type === 'recruiter' ? '[موظف توظيف]' : user.user_type === 'admin' ? '[أدمن]' : '[فريلانسر]')
+    : (user.user_type === 'recruiter' ? '[Recruiter]' : user.user_type === 'admin' ? '[Admin]' : '[Freelancer]');
+  const dropdownSideClass = language === 'ar' ? 'left-0 right-auto' : 'right-0';
+  const dropdownTextClass = language === 'ar' ? 'text-right' : 'text-left';
   const isVerified = Boolean(user.email_verified);
   const verificationBadge = isVerified
     ? {
@@ -76,7 +82,7 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
           />
 
           {/* Dropdown Content */}
-          <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-2xl z-20 border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div dir={language === 'ar' ? 'rtl' : 'ltr'} className={`absolute ${dropdownSideClass} mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-2xl z-20 border border-gray-200 dark:border-gray-700 overflow-hidden ${dropdownTextClass}`}>
             {/* User Info Header */}
             <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
@@ -85,7 +91,7 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
                   <p className="font-bold text-gray-800 dark:text-gray-100">{firstName}</p>
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm text-gray-500 dark:text-gray-400">{userTypeDisplay}</p>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${verificationBadge.className}`}>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide border ${verificationBadge.className}`}>
                       {isVerified ? (
                         <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707a1 1 0 00-1.414-1.414L9 11.172 7.707 9.879a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -95,7 +101,7 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 7a1.25 1.25 0 100-2.5A1.25 1.25 0 0010 14z" clipRule="evenodd" />
                         </svg>
                       )}
-                      {verificationBadge.label}
+                      {isVerified ? t('dropdown.verified') : t('dropdown.unverified')}
                     </span>
                   </div>
                 </div>
@@ -106,10 +112,10 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
             <div className="py-2">
               <button
                 onClick={() => handleNavigation('/')}
-                className="w-full px-4 py-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
+                className={`w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3 ${language === 'ar' ? 'text-right flex-row-reverse justify-end' : 'text-left'}`}
               >
                 <span className="text-lg">🏠</span>
-                <span>Home</span>
+                <span>{t('dropdown.home')}</span>
               </button>
 
               <button
@@ -117,30 +123,30 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
                   setShowDropdown(false);
                   navigate('/dashboard');
                 }}
-                className="w-full px-4 py-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
+                className={`w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3 ${language === 'ar' ? 'text-right flex-row-reverse justify-end' : 'text-left'}`}
               >
                 <span className="text-lg">📊</span>
-                <span>Dashboard</span>
+                <span>{t('dropdown.dashboard')}</span>
               </button>
 
               {user.user_type === 'job_seeker' && (
                 <>
                   <button
                     onClick={() => handleNavigation('/profile')}
-                    className="w-full px-4 py-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
+                    className={`w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3 ${language === 'ar' ? 'text-right flex-row-reverse justify-end' : 'text-left'}`}
                   >
                     <span className="text-lg">✏️</span>
-                    <span>Edit Profile</span>
+                    <span>{t('dropdown.editProfile')}</span>
                   </button>
 
                   <button
                     onClick={() => handleNavigation('/saved-jobs')}
-                    className="w-full px-4 py-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
+                    className={`w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3 ${language === 'ar' ? 'text-right flex-row-reverse justify-end' : 'text-left'}`}
                   >
                     <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                     </svg>
-                    <span>Saved Jobs</span>
+                    <span>{t('dropdown.savedJobs')}</span>
                   </button>
                 </>
               )}
@@ -151,10 +157,10 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
                     setShowDropdown(false);
                     navigate('/dashboard?tab=find-candidates');
                   }}
-                  className="w-full px-4 py-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
+                  className={`w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3 ${language === 'ar' ? 'text-right flex-row-reverse justify-end' : 'text-left'}`}
                 >
                   <span className="text-lg">🔍</span>
-                  <span>Find Candidates</span>
+                  <span>{t('dropdown.findCandidates')}</span>
                 </button>
               )}
 
@@ -164,7 +170,7 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
                   className="w-full px-4 py-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
                 >
                   <span className="text-lg">⚙️</span>
-                  <span>Admin Panel</span>
+                  <span>{t('dropdown.adminPanel')}</span>
                 </button>
               )}
 
@@ -173,10 +179,10 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
 
               <button
                 onClick={handleLogout}
-                className="w-full px-4 py-3 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center gap-3"
+                className={`w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center gap-3 ${language === 'ar' ? 'text-right flex-row-reverse justify-end' : 'text-left'}`}
               >
                 <span className="text-lg">🚪</span>
-                <span>Log out</span>
+                <span>{t('dropdown.logout')}</span>
               </button>
             </div>
           </div>

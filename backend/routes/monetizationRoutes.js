@@ -7,6 +7,49 @@ const router = express.Router();
 const pool = require('../config/database');
 const { authenticateToken: protect } = require('../middleware/auth');
 const paymobService = require('../utils/paymobService');
+
+const DEFAULT_FREELANCER_PLANS = [
+    {
+        name: 'Starter',
+        user_type: 'job_seeker',
+        duration_months: 1,
+        price_egp: 99,
+        first_time_price_egp: null,
+        features: {
+            daily_applications: 20,
+            ads: false,
+            premium_badge: true,
+            priority_search: false
+        }
+    },
+    {
+        name: 'Pro',
+        user_type: 'job_seeker',
+        duration_months: 3,
+        price_egp: 279,
+        first_time_price_egp: null,
+        features: {
+            daily_applications: 20,
+            ads: false,
+            premium_badge: true,
+            priority_search: true
+        }
+    },
+    {
+        name: 'Pro-Plus',
+        user_type: 'job_seeker',
+        duration_months: 6,
+        price_egp: 549,
+        first_time_price_egp: null,
+        features: {
+            daily_applications: 20,
+            ads: false,
+            premium_badge: true,
+            priority_search: true,
+            boosted_visibility: true
+        }
+    }
+];
 // ==========================================
 // SUBSCRIPTION ROUTES (Job Seekers)
 // ==========================================
@@ -19,12 +62,14 @@ router.get('/subscription/plans', protect, async (req, res) => {
     try {
         const userId = req.user.userId;
 
+        await ensureFreelancerPlansSeeded();
+
         // Check if user has ever been premium
         const hasBeenPremium = await checkIfWasPremiumBefore(userId);
 
         // Fetch plans
         const result = await pool.query(
-            'SELECT * FROM subscription_plans WHERE user_type = $1 AND is_active = true ORDER BY price_egp ASC',
+            'SELECT * FROM subscription_plans WHERE user_type = $1 AND is_active = true ORDER BY duration_months ASC, price_egp ASC',
             ['job_seeker']
         );
 
@@ -84,7 +129,7 @@ router.get('/subscription/status', protect, async (req, res) => {
         }
 
         // Calculate applications remaining today
-        const dailyLimit = user.subscription_tier === 'premium' ? 40 : 10;
+        const dailyLimit = user.subscription_tier === 'premium' ? 20 : 5;
         const applicationsRemaining = Math.max(0, dailyLimit - user.applications_used_today);
 
         res.json({
@@ -111,6 +156,8 @@ router.post('/subscription/purchase', protect, async (req, res) => {
     try {
         const userId = req.user.userId;
         const { planId } = req.body;
+
+        await ensureFreelancerPlansSeeded();
 
         // Check if user is job seeker (userId is UUID)
         const userResult = await pool.query('SELECT user_type, subscription_tier FROM users WHERE id = $1::uuid', [userId]);
@@ -459,6 +506,23 @@ async function checkIfWasPremiumBefore(userId) {
         [userId]
     );
     return result.rows[0].count > 0;
+}
+
+async function ensureFreelancerPlansSeeded() {
+    for (const plan of DEFAULT_FREELANCER_PLANS) {
+        const existing = await pool.query(
+            'SELECT id FROM subscription_plans WHERE user_type = $1 AND name = $2 AND duration_months = $3 LIMIT 1',
+            [plan.user_type, plan.name, plan.duration_months]
+        );
+
+        if (existing.rows.length === 0) {
+            await pool.query(
+                `INSERT INTO subscription_plans (name, user_type, duration_months, price_egp, first_time_price_egp, features, is_active)
+                 VALUES ($1, $2, $3, $4, $5, $6::jsonb, true)`,
+                [plan.name, plan.user_type, plan.duration_months, plan.price_egp, plan.first_time_price_egp, JSON.stringify(plan.features)]
+            );
+        }
+    }
 }
 
 async function processSubscriptionPayment(payment) {

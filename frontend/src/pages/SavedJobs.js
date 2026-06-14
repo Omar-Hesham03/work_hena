@@ -5,12 +5,15 @@ import { getSavedJobs, unsaveJob } from '../services/api';
 import NotificationBell from '../components/NotificationBell';
 import DarkModeToggle from '../components/DarkModeToggle';
 import ProfileDropdown from '../components/ProfileDropdown';
+import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 function SavedJobs() {
   const [savedJobs, setSavedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, logout, loading: authLoading } = useContext(AuthContext);
+  const { language } = useLanguage();
   const navigate = useNavigate();
+  const tr = (en, ar) => (language === 'ar' ? ar : en);
 
   useEffect(() => {
     // Wait for auth to finish loading
@@ -21,7 +24,7 @@ function SavedJobs() {
       return;
     }
     if (user.user_type !== 'job_seeker') {
-      toast.error('Only job seekers can save jobs');
+      toast.error(tr('Only job seekers can save jobs', 'فقط الباحثين عن عمل يقدروا يحفظوا الوظايف'));
       navigate('/dashboard');
       return;
     }
@@ -44,7 +47,7 @@ function SavedJobs() {
       await unsaveJob(jobId);
       setSavedJobs(savedJobs.filter(sj => sj.job_id !== jobId));
     } catch (error) {
-      toast.error('Error unsaving job');
+      toast.error(tr('Error unsaving job', 'حصل خطأ أثناء إزالة الوظيفة'));
     }
   };
 
@@ -56,7 +59,7 @@ function SavedJobs() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors">
-        <p className="text-gray-600 dark:text-gray-400">Loading saved jobs...</p>
+        <p className="text-gray-600 dark:text-gray-400">{tr('Loading saved jobs...', 'جاري تحميل الوظايف المحفوظة...')}</p>
       </div>
     );
   }
@@ -90,18 +93,18 @@ function SavedJobs() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Saved Jobs</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Jobs you've bookmarked for later</p>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">{tr("Jobs you've bookmarked for later", 'الوظايف اللي حفظتها للرجوع لها لاحقًا')}</p>
         </div>
 
         {savedJobs.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center transition-colors">
-            <p className="text-gray-600 dark:text-gray-400 mb-4">You haven't saved any jobs yet.</p>
-            <p className="text-gray-500 dark:text-gray-500 mb-6">Click the heart icon on any job to save it for later!</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{tr("You haven't saved any jobs yet.", 'ما حفظتش أي وظيفة لسه.')}</p>
+            <p className="text-gray-500 dark:text-gray-500 mb-6">{tr('Click the heart icon on any job to save it for later!', 'اضغط على أيقونة القلب في أي وظيفة عشان تحفظها.')}</p>
             <button
               onClick={() => navigate('/')}
               className="px-6 py-3 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition"
             >
-              Start Browsing Jobs
+              {tr('Start Browsing Jobs', 'ابدأ استعراض الوظايف')}
             </button>
           </div>
         ) : (
@@ -115,7 +118,7 @@ function SavedJobs() {
                     <button
                       onClick={() => handleUnsave(job.id)}
                       className="flex-shrink-0 hover:scale-110 transition"
-                      title="Remove from saved"
+                      title={tr('Remove from saved', 'إزالة من المحفوظات')}
                     >
                       {/* Filled heart with X overlay */}
                       <svg className="w-6 h-6 text-red-500 hover:text-red-700" fill="currentColor" viewBox="0 0 20 20">
@@ -138,14 +141,14 @@ function SavedJobs() {
                   <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{job.description}</p>
 
                   <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-                    Saved on {new Date(savedJob.created_at).toLocaleDateString()}
+                    {tr('Saved on', 'تم الحفظ في')} {new Date(savedJob.created_at).toLocaleDateString()}
                   </p>
 
                   <button
                     onClick={() => handleApply(job.id)}
                     className="w-full bg-primary dark:bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold"
                   >
-                    Apply Now
+                    {tr('Apply Now', 'قدّم الآن')}
                   </button>
                 </div>
               );

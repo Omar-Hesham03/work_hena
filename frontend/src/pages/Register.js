@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 import DarkModeToggle from '../components/DarkModeToggle';
 
@@ -28,6 +29,7 @@ function Register() {
   });
 
   const { register } = useContext(AuthContext);
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   // Real-time email validation
@@ -142,15 +144,15 @@ function Register() {
       </div>
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Create Account</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Join JobBoard today</p>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('register.title')}</h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">{t('register.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8 space-y-5 transition-colors">
           {/* Full Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Full Name *
+              {t('register.fullName')}
             </label>
             <input
               type="text"
@@ -172,7 +174,7 @@ function Register() {
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email *
+              {t('register.email')}
             </label>
             <input
               type="email"
@@ -194,7 +196,7 @@ function Register() {
           {/* Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Password *
+              {t('register.password')}
             </label>
             <div className="relative">
               <input
@@ -232,19 +234,19 @@ function Register() {
               <div className="mt-3 space-y-2">
                 <PasswordRequirement
                   met={passwordValidation.minLength}
-                  text="At least 8 characters"
+                  text={t('register.passwordMinLength', 'At least 8 characters')}
                 />
                 <PasswordRequirement
                   met={passwordValidation.hasUppercase}
-                  text="At least 1 uppercase letter"
+                  text={t('register.passwordUppercase', 'At least 1 uppercase letter')}
                 />
                 <PasswordRequirement
                   met={passwordValidation.hasLowercase}
-                  text="At least 1 lowercase letter"
+                  text={t('register.passwordLowercase', 'At least 1 lowercase letter')}
                 />
                 <PasswordRequirement
                   met={passwordValidation.hasNumber}
-                  text="At least 1 number"
+                  text={t('register.passwordNumber', 'At least 1 number')}
                 />
               </div>
             )}
@@ -253,7 +255,7 @@ function Register() {
           {/* Phone */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Phone (Optional)
+              {t('register.phone')}
             </label>
             <input
               type="tel"
@@ -268,7 +270,7 @@ function Register() {
           {/* User Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              I am a *
+              {t('register.role')}
             </label>
             <div className="grid grid-cols-2 gap-4">
               <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.user_type === 'job_seeker'
@@ -283,7 +285,7 @@ function Register() {
                   onChange={handleChange}
                   className="sr-only"
                 />
-                <span className="text-gray-900 dark:text-gray-100 font-medium">Job Seeker</span>
+                <span className="text-gray-900 dark:text-gray-100 font-medium">{t('register.jobSeeker')}</span>
               </label>
 
               <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.user_type === 'recruiter'
@@ -298,7 +300,7 @@ function Register() {
                   onChange={handleChange}
                   className="sr-only"
                 />
-                <span className="text-gray-900 dark:text-gray-100 font-medium">Recruiter</span>
+                <span className="text-gray-900 dark:text-gray-100 font-medium">{t('register.recruiter')}</span>
               </label>
             </div>
           </div>
@@ -307,7 +309,7 @@ function Register() {
           {formData.user_type === 'recruiter' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Company Name *
+                {t('register.companyName')}
               </label>
               <input
                 type="text"
@@ -333,17 +335,17 @@ function Register() {
             disabled={!isFormValid() || isSubmitting}
             className="w-full bg-primary dark:bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Creating Account...' : 'Create Account'}
+            {isSubmitting ? t('register.creating') : t('register.createAccount')}
           </button>
 
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?{' '}
+            {t('register.haveAccount')}{' '}
             <button
               type="button"
               onClick={() => navigate('/login')}
               className="text-primary dark:text-blue-400 hover:underline font-semibold"
             >
-              Sign In
+              {t('register.signIn')}
             </button>
           </p>
         </form>

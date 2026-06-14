@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getSubscriptionStatus } from '../services/api';
 import { toast } from 'sonner';
 
@@ -7,6 +8,7 @@ function ApplicationCounter({ onUpgradeClick }) {
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
     const { user } = useContext(AuthContext);
+    const { t } = useLanguage();
 
     useEffect(() => {
         if (user && user.user_type === 'job_seeker') {
@@ -31,18 +33,19 @@ function ApplicationCounter({ onUpgradeClick }) {
 
     const { applicationsRemaining, dailyLimit, tier } = status || {};
     const isPremium = tier === 'premium';
+    const usageRatio = dailyLimit ? applicationsRemaining / dailyLimit : 1;
+    const statusClass = usageRatio <= 0.2
+        ? 'text-red-600 dark:text-red-400'
+        : usageRatio <= 0.4
+            ? 'text-yellow-600 dark:text-yellow-400'
+            : 'text-green-600 dark:text-green-400';
 
     return (
         <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
             {/* Applications Counter */}
             <div className="flex items-center gap-2">
-                <span className="hidden sm:inline text-xs font-bold text-gray-600 dark:text-gray-400">Applications:</span>
-                <span className={`text-sm font-bold ${applicationsRemaining <= 2
-                    ? 'text-red-600 dark:text-red-400'
-                    : applicationsRemaining <= 5
-                        ? 'text-yellow-600 dark:text-yellow-400'
-                        : 'text-green-600 dark:text-green-400'
-                    }`}>
+                <span className="hidden sm:inline text-xs font-bold text-gray-600 dark:text-gray-400">{t('applicationCounter.applications')}</span>
+                <span className={`text-sm font-bold ${statusClass}`}>
                     {applicationsRemaining}/{dailyLimit}
                 </span>
             </div>
@@ -54,7 +57,7 @@ function ApplicationCounter({ onUpgradeClick }) {
                     ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white'
                     : 'bg-primary dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700'
                     }`}
-                title={isPremium ? 'Manage subscription' : 'Upgrade to Premium'}
+                title={isPremium ? t('applicationCounter.manage') : t('applicationCounter.upgrade')}
             >
                 {isPremium ? (
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">

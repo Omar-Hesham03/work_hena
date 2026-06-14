@@ -16,6 +16,9 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 
+const SITE_NAME = 'WorkHena';
+const DEFAULT_PUBLIC_URL = process.env.REACT_APP_PUBLIC_URL || '';
+
 const defaultMeta = {
   title: 'WorkHena | Jobs, Hiring, and Career Growth',
   description: 'WorkHena helps job seekers find great jobs and recruiters hire faster with smart matching, saved jobs, and streamlined hiring tools.',
@@ -37,27 +40,53 @@ const routeMeta = [
   { path: '/verify-email', title: 'Verify Email | WorkHena', description: 'Verify your WorkHena email address to unlock full account access.', index: false }
 ];
 
+const buildCanonicalUrl = (pathname) => {
+  const baseUrl = DEFAULT_PUBLIC_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+
+  if (!baseUrl) {
+    return pathname;
+  }
+
+  const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
+
+  return `${baseUrl.replace(/\/+$/, '')}${normalizedPath}`;
+};
+
 function RouteHead() {
   const { pathname } = useLocation();
   const matchedRoute = routeMeta.find((route) => (
     route.matchPrefix ? pathname.startsWith(route.path) : pathname === route.path
   ));
   const meta = matchedRoute || defaultMeta;
-  const canonical = typeof window !== 'undefined' ? `${window.location.origin}${pathname}` : pathname;
+  const canonical = buildCanonicalUrl(pathname);
+  const structuredData = pathname === '/' ? {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: canonical,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${canonical}jobs?search={search_term_string}`,
+      'query-input': 'required name=search_term_string'
+    }
+  } : null;
 
   return (
     <Helmet>
       <title>{meta.title}</title>
       <meta name="description" content={meta.description} />
       <meta name="robots" content={meta.index ? 'index,follow' : 'noindex,nofollow'} />
+      <meta name="author" content={SITE_NAME} />
       <link rel="canonical" href={canonical} />
       <meta property="og:type" content="website" />
+      <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:title" content={meta.title} />
       <meta property="og:description" content={meta.description} />
       <meta property="og:url" content={canonical} />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={meta.title} />
       <meta name="twitter:description" content={meta.description} />
+      {structuredData ? <script type="application/ld+json">{JSON.stringify(structuredData)}</script> : null}
     </Helmet>
   );
 }

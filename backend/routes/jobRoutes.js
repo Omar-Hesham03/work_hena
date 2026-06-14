@@ -4,6 +4,7 @@ const { authenticateToken, isRecruiter } = require('../middleware/auth');
 const { validateCreateJob, validateUpdateJob } = require('../middleware/validators');
 const { calculateJobMatch } = require('../utils/jobMatchingAlgorithm');
 const { checkCreditsForJobPost, deductCreditsForJobPost } = require('../middleware/monetizationMiddleware');
+const { jobPostingLimiter } = require('../middleware/security');
 
 module.exports = (supabase) => {
 
@@ -165,7 +166,7 @@ module.exports = (supabase) => {
 
   // Create new job (recruiter only)
   // Use checkCreditsForJobPost middleware to verify credits BEFORE creating job
-  router.post('/', authenticateToken, isRecruiter, validateCreateJob, checkCreditsForJobPost, async (req, res) => {
+  router.post('/', jobPostingLimiter, authenticateToken, isRecruiter, validateCreateJob, checkCreditsForJobPost, async (req, res) => {
     try {
       const { title, description, company, location, job_type, work_mode, salary_range, requirements } = req.body;
       const { data, error } = await supabase

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import NotificationBell from './NotificationBell';
 import DarkModeToggle from './DarkModeToggle';
 import ProfileDropdown from './ProfileDropdown';
@@ -13,6 +14,7 @@ import VerificationBanner from './VerificationBanner';
 
 function Navbar() {
     const { user, logout } = useContext(AuthContext);
+    const { language, toggleLanguage, t } = useLanguage();
     const navigate = useNavigate();
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showCreditModal, setShowCreditModal] = useState(false);
@@ -71,6 +73,14 @@ function Navbar() {
 
                         {/* Right Side Actions */}
                         <div className="flex gap-1.5 sm:gap-2 md:gap-3 items-center">
+                            <button
+                                onClick={toggleLanguage}
+                                className="h-9 min-w-9 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                                title={t('navbar.languageTitle')}
+                            >
+                                {language === 'en' ? 'عربي' : 'EN'}
+                            </button>
+
                             <DarkModeToggle />
 
                             {/* Job Seeker: Application Counter */}
@@ -99,13 +109,13 @@ function Navbar() {
                                         onClick={() => navigate('/login')}
                                         className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
                                     >
-                                        Login
+                                        {t('navbar.login')}
                                     </button>
                                     <button
                                         onClick={() => navigate('/register')}
                                         className="px-3 py-1.5 sm:px-6 sm:py-2 text-sm sm:text-base bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition"
                                     >
-                                        Sign Up
+                                        {t('navbar.signUp')}
                                     </button>
                                 </div>
                             )}

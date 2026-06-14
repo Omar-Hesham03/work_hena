@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import DarkModeToggle from '../components/DarkModeToggle';
 import api from '../services/api';
 
@@ -7,6 +8,8 @@ function VerifyEmail() {
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
     const navigate = useNavigate();
+    const { language } = useLanguage();
+    const tr = (en, ar) => (language === 'ar' ? ar : en);
 
     const [status, setStatus] = useState('verifying'); // 'verifying' | 'success' | 'error'
     const [errorMessage, setErrorMessage] = useState('');
@@ -14,7 +17,7 @@ function VerifyEmail() {
     useEffect(() => {
         if (!token) {
             setStatus('error');
-            setErrorMessage('Invalid verification link.');
+            setErrorMessage(tr('Invalid verification link.', 'لينك التحقق غير صالح.'));
             return;
         }
         verifyEmail();
@@ -35,7 +38,7 @@ function VerifyEmail() {
             }
         } catch (error) {
             setStatus('error');
-            setErrorMessage(error.response?.data?.error || 'Something went wrong. Please try again.');
+            setErrorMessage(error.response?.data?.error || tr('Something went wrong. Please try again.', 'حصلت مشكلة. حاول تاني.'));
         }
     };
 
@@ -51,8 +54,8 @@ function VerifyEmail() {
                 {status === 'verifying' && (
                     <>
                         <div className="text-5xl mb-4 animate-pulse">✉️</div>
-                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Verifying your email...</h2>
-                        <p className="text-gray-600 dark:text-gray-400">Please wait a moment.</p>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">{tr('Verifying your email...', 'جاري التحقق من الإيميل...')}</h2>
+                        <p className="text-gray-600 dark:text-gray-400">{tr('Please wait a moment.', 'استنى لحظة من فضلك.')}</p>
                     </>
                 )}
 
@@ -60,15 +63,15 @@ function VerifyEmail() {
                 {status === 'success' && (
                     <>
                         <div className="text-5xl mb-4">🎉</div>
-                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Email Verified!</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">{tr('Email Verified!', 'تم التحقق من الإيميل!')}</h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            Your email has been verified successfully. You're all set!
+                            {tr("Your email has been verified successfully. You're all set!", 'تم التحقق من الإيميل بنجاح. كل حاجة جاهزة!')}
                         </p>
                         <button
                             onClick={() => navigate('/')}
                             className="w-full bg-primary dark:bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold"
                         >
-                            Go to Home
+                            {tr('Go to Home', 'الرجوع للرئيسية')}
                         </button>
                     </>
                 )}
@@ -77,13 +80,13 @@ function VerifyEmail() {
                 {status === 'error' && (
                     <>
                         <div className="text-5xl mb-4">❌</div>
-                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Verification Failed</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">{tr('Verification Failed', 'فشل التحقق')}</h2>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">{errorMessage}</p>
                         <button
                             onClick={() => navigate('/')}
                             className="w-full bg-primary dark:bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold"
                         >
-                            Go to Home
+                            {tr('Go to Home', 'الرجوع للرئيسية')}
                         </button>
                     </>
                 )}

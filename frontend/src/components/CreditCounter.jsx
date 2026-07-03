@@ -47,7 +47,7 @@ function CreditCounter({ onPurchaseClick }) {
     const { balance: credits, isFirstPurchase } = balance || {};
 
     return (
-        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex items-center gap-1 sm:gap-2 bg-white dark:bg-gray-800 px-1.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
             {/* Credit Counter */}
             <div className="flex items-center gap-2">
                 <span className="hidden sm:inline text-xs font-bold text-gray-600 dark:text-gray-400">{t('creditCounter.credits')}</span>

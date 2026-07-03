@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { searchCandidates, sendJobInvitation } from '../services/api';
 import AvatarDisplay from './AvatarDisplay';
 import { toast } from 'sonner';
+import { useLanguage } from '../context/LanguageContext';
+
 function CandidateSearch({ myJobs }) {
     const [candidates, setCandidates] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -10,6 +12,8 @@ function CandidateSearch({ myJobs }) {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [selectedCandidate, setSelectedCandidate] = useState(null);
     const [sending, setSending] = useState(false);
+    const { language } = useLanguage();
+    const tr = (en, ar) => (language === 'ar' ? ar : en);
 
     useEffect(() => {
         fetchCandidates();
@@ -46,33 +50,33 @@ function CandidateSearch({ myJobs }) {
 
     const handleInvite = async () => {
         if (!selectedJob) {
-            toast.error('Please select a job first');
+            toast.error(tr('Please select a job first', 'من فضلك اختار وظيفة الأول'));
             return;
         }
 
         setSending(true);
         try {
             await sendJobInvitation(selectedCandidate.id, selectedJob);
-            toast.success(`Invitation sent to ${selectedCandidate.full_name}! 🎉`);
+            toast.success(tr(`Invitation sent to ${selectedCandidate.full_name}! 🎉`, `تم إرسال الدعوة لـ ${selectedCandidate.full_name}! 🎉`));
             setShowInviteModal(false);
             setSelectedJob('');
             setSelectedCandidate(null);
         } catch (error) {
-            toast.error('Error sending invitation: ' + (error.response?.data?.error || error.message));
+            toast.error(tr('Error sending invitation: ', 'خطأ في إرسال الدعوة: ') + (error.response?.data?.error || error.message));
         }
         setSending(false);
     };
 
     return (
         <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Find Candidates</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">{tr('Find Candidates', 'ابحث عن مرشحين')}</h2>
 
             {/* Search Bar */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
                 <div className="flex gap-4">
                     <input
                         type="text"
-                        placeholder="Search by name or email..."
+                        placeholder={tr('Search by name or email...', 'ابحث بالاسم أو الإيميل...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -82,17 +86,17 @@ function CandidateSearch({ myJobs }) {
                         onClick={handleSearch}
                         className="px-6 py-2 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold"
                     >
-                        Search
+                        {tr('Search', 'ابحث')}
                     </button>
                 </div>
             </div>
 
             {/* Candidates List */}
             {loading ? (
-                <p className="text-gray-600 dark:text-gray-400">Loading candidates...</p>
+                <p className="text-gray-600 dark:text-gray-400">{tr('Loading candidates...', 'جاري تحميل المرشحين...')}</p>
             ) : candidates.length === 0 ? (
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center transition-colors">
-                    <p className="text-gray-600 dark:text-gray-400">No candidates found.</p>
+                    <p className="text-gray-600 dark:text-gray-400">{tr('No candidates found.', 'مافيش مرشحين.')}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -110,7 +114,7 @@ function CandidateSearch({ myJobs }) {
                                 onClick={() => openInviteModal(candidate)}
                                 className="w-full bg-secondary dark:bg-green-600 text-white py-2 rounded-lg hover:bg-green-600 dark:hover:bg-green-700 transition font-semibold"
                             >
-                                Invite to Apply
+                                {tr('Invite to Apply', 'ادعُه للتقديم')}
                             </button>
                         </div>
                     ))}
@@ -122,11 +126,11 @@ function CandidateSearch({ myJobs }) {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full transition-colors">
                         <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
-                            Invite {selectedCandidate.full_name}
+                            {tr('Invite', 'ادعُ')} {selectedCandidate.full_name}
                         </h3>
 
                         <p className="text-gray-700 dark:text-gray-300 mb-4">
-                            Select a job to invite this candidate to apply:
+                            {tr('Select a job to invite this candidate to apply:', 'اختار وظيفة عشان تدعو المرشح ده يقدّم عليها:')}
                         </p>
 
                         <select
@@ -134,10 +138,10 @@ function CandidateSearch({ myJobs }) {
                             onChange={(e) => setSelectedJob(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 mb-4"
                         >
-                            <option value="">Select a job...</option>
+                            <option value="">{tr('Select a job...', 'اختار وظيفة...')}</option>
                             {myJobs.filter(job => job.status === 'open').map((job) => (
                                 <option key={job.id} value={job.id}>
-                                    {job.title} at {job.company}
+                                    {job.title} {tr('at', 'في')} {job.company}
                                 </option>
                             ))}
                         </select>
@@ -148,7 +152,7 @@ function CandidateSearch({ myJobs }) {
                                 disabled={sending}
                                 className="flex-1 bg-primary dark:bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold disabled:opacity-50"
                             >
-                                {sending ? 'Sending...' : 'Send Invitation'}
+                                {sending ? tr('Sending...', 'جاري الإرسال...') : tr('Send Invitation', 'ابعت الدعوة')}
                             </button>
                             <button
                                 onClick={() => {
@@ -158,7 +162,7 @@ function CandidateSearch({ myJobs }) {
                                 disabled={sending}
                                 className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition disabled:opacity-50"
                             >
-                                Cancel
+                                {tr('Cancel', 'إلغاء')}
                             </button>
                         </div>
                     </div>

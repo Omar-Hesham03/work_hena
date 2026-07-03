@@ -26,11 +26,11 @@ function VerificationBanner() {
     };
 
     return (
-        <div className="bg-yellow-50 dark:bg-yellow-900/30 border-b border-yellow-200 dark:border-yellow-700">
-            <div className="container mx-auto px-4 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
-                    <span>⚠️</span>
-                    <span>{t('verification.message')}</span>
+        <div className="bg-yellow-50 dark:bg-yellow-900/30 border-b border-yellow-200 dark:border-yellow-700 overflow-x-hidden">
+            <div className="container mx-auto max-w-full px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200 min-w-0 text-center sm:text-start">
+                    <span className="flex-shrink-0">⚠️</span>
+                    <span className="break-words">{t('verification.message')}</span>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                     <button

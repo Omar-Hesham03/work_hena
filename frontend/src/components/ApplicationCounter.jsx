@@ -41,11 +41,11 @@ function ApplicationCounter({ onUpgradeClick }) {
             : 'text-green-600 dark:text-green-400';
 
     return (
-        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-2 sm:px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex items-center gap-1 sm:gap-2 bg-white dark:bg-gray-800 px-1.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
             {/* Applications Counter */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
                 <span className="hidden sm:inline text-xs font-bold text-gray-600 dark:text-gray-400">{t('applicationCounter.applications')}</span>
-                <span className={`text-sm font-bold ${statusClass}`}>
+                <span className={`text-xs sm:text-sm font-bold whitespace-nowrap ${statusClass}`}>
                     {applicationsRemaining}/{dailyLimit}
                 </span>
             </div>
@@ -53,7 +53,7 @@ function ApplicationCounter({ onUpgradeClick }) {
             {/* Upgrade Button */}
             <button
                 onClick={onUpgradeClick}
-                className={`flex items-center justify-center w-6 h-6 rounded-full transition ${isPremium
+                className={`flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full transition ${isPremium
                     ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-white'
                     : 'bg-primary dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700'
                     }`}

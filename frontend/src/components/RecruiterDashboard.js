@@ -153,19 +153,19 @@ function RecruiterDashboard() {
                             <form onSubmit={handleCreateJob}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Job Title *</label>
+                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Job Title *', 'مسمى الوظيفة *')}</label>
                                         <input
                                             type="text"
                                             value={newJob.title}
                                             onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
                                             required
                                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                            placeholder="e.g. Senior Developer"
+                                            placeholder={tr('e.g. Senior Developer', 'مثال: مطور أول')}
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Company *</label>
+                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Company *', 'الشركة *')}</label>
                                         <input
                                             type="text"
                                             value={newJob.company}
@@ -176,71 +176,71 @@ function RecruiterDashboard() {
                                     </div>
 
                                     <div>
-                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Location *</label>
+                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Location *', 'المكان *')}</label>
                                         <input
                                             type="text"
                                             value={newJob.location}
                                             onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
                                             required
                                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                            placeholder="e.g. New York, NY"
+                                            placeholder={tr('e.g. Cairo, Egypt', 'مثال: القاهرة، مصر')}
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Job Type *</label>
+                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Job Type *', 'نوع الشغل *')}</label>
                                         <select
                                             value={newJob.job_type}
                                             onChange={(e) => setNewJob({ ...newJob, job_type: e.target.value })}
                                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                         >
-                                            <option value="full-time">Full-time</option>
-                                            <option value="part-time">Part-time</option>
-                                            <option value="contract">Contract</option>
-                                            <option value="flexible">Flexible</option>
+                                            <option value="full-time">{tr('Full-time', 'دوام كامل')}</option>
+                                            <option value="part-time">{tr('Part-time', 'دوام جزئي')}</option>
+                                            <option value="contract">{tr('Contract', 'عقد')}</option>
+                                            <option value="flexible">{tr('Flexible', 'مرن')}</option>
                                         </select>
                                     </div>
 
                                     <div>
-                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Work Mode *</label>
+                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Work Mode *', 'نمط الشغل *')}</label>
                                         <select
                                             value={newJob.work_mode}
                                             onChange={(e) => setNewJob({ ...newJob, work_mode: e.target.value })}
                                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                         >
-                                            <option value="on-site">On-site</option>
-                                            <option value="remote">Remote</option>
-                                            <option value="hybrid">Hybrid</option>
+                                            <option value="on-site">{tr('On-site', 'في المقر')}</option>
+                                            <option value="remote">{tr('Remote', 'عن بُعد')}</option>
+                                            <option value="hybrid">{tr('Hybrid', 'هجين')}</option>
                                         </select>
                                     </div>
 
                                     <div>
-                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Salary Range</label>
+                                        <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Salary Range', 'نطاق الراتب')}</label>
                                         <input
                                             type="text"
                                             value={newJob.salary_range}
                                             onChange={(e) => setNewJob({ ...newJob, salary_range: e.target.value })}
                                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                            placeholder="e.g. $80k - $120k"
+                                            placeholder={tr('e.g. 15k - 25k EGP', 'مثال: 15 ألف - 25 ألف جنيه')}
                                         />
                                     </div>
                                 </div>
 
                                 <div className="mt-4">
-                                    <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Job Description *</label>
+                                    <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Job Description *', 'وصف الوظيفة *')}</label>
                                     <RichTextEditor
                                         value={newJob.description}
                                         onChange={(value) => setNewJob({ ...newJob, description: value })}
-                                        placeholder="Describe the role, responsibilities, and what makes this position great..."
+                                        placeholder={tr('Describe the role, responsibilities, and what makes this position great...', 'اوصف الدور والمسؤوليات وإيه اللي يميز الوظيفة دي...')}
                                     />
                                 </div>
 
                                 <div className="mt-4">
-                                    <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Requirements *</label>
+                                    <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Requirements *', 'المتطلبات *')}</label>
                                     <RichTextEditor
                                         value={newJob.requirements}
                                         onChange={(value) => setNewJob({ ...newJob, requirements: value })}
-                                        placeholder="List required skills, experience, education, etc..."
+                                        placeholder={tr('List required skills, experience, education, etc...', 'اذكر المهارات والخبرة والتعليم المطلوبة...')}
                                     />
                                 </div>
 
@@ -248,7 +248,7 @@ function RecruiterDashboard() {
                                     type="submit"
                                     className="mt-4 px-6 py-3 bg-secondary dark:bg-green-600 text-white rounded-lg hover:bg-green-600 dark:hover:bg-green-700 transition font-semibold"
                                 >
-                                    Post Job
+                                    {tr('Post Job', 'انشر الوظيفة')}
                                 </button>
                             </form>
                         </div>
@@ -256,10 +256,10 @@ function RecruiterDashboard() {
 
                     {/* Jobs List */}
                     {loading ? (
-                        <p className="text-gray-600 dark:text-gray-400">Loading your jobs...</p>
+                        <p className="text-gray-600 dark:text-gray-400">{tr('Loading your jobs...', 'جاري تحميل وظايفك...')}</p>
                     ) : jobs.length === 0 ? (
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center transition-colors">
-                            <p className="text-gray-600 dark:text-gray-400">You haven't posted any jobs yet.</p>
+                            <p className="text-gray-600 dark:text-gray-400">{tr("You haven't posted any jobs yet.", 'مانشرتش أي وظيفة لسه.')}</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-6">
@@ -273,7 +273,7 @@ function RecruiterDashboard() {
                                             <p className="text-primary dark:text-blue-400 font-semibold">{job.company}</p>
                                             <p className="text-gray-600 dark:text-gray-400">📍 {job.location} • {job.job_type}</p>
                                             {job.salary_range && <p className="text-secondary dark:text-green-400">💰 {job.salary_range}</p>}
-                                            <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">Posted: {new Date(job.created_at).toLocaleDateString()}</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">{tr('Posted:', 'نُشرت:')} {new Date(job.created_at).toLocaleDateString()}</p>
                                         </div>
 
                                         {/* Right: Action Buttons */}
@@ -282,13 +282,13 @@ function RecruiterDashboard() {
                                                 onClick={() => viewApplications(job)}
                                                 className="flex-1 sm:flex-none px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition text-sm whitespace-nowrap"
                                             >
-                                                View Applications
+                                                {tr('View Applications', 'عرض الطلبات')}
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteJob(job)}
                                                 className="flex-1 sm:flex-none px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition text-sm"
                                             >
-                                                Delete
+                                                {tr('Delete', 'حذف')}
                                             </button>
                                         </div>
                                     </div>
@@ -308,7 +308,7 @@ function RecruiterDashboard() {
                                                 onClick={() => toggleJobExpansion(job.id)}
                                                 className="text-primary dark:text-blue-400 hover:underline text-sm mt-2 font-semibold"
                                             >
-                                                {expandedJobs.has(job.id) ? 'View Less' : 'View More'}
+                                                {expandedJobs.has(job.id) ? tr('View Less', 'عرض أقل') : tr('View More', 'عرض أكتر')}
                                             </button>
                                         </div>
                                     </div>
@@ -326,13 +326,13 @@ function RecruiterDashboard() {
                                         !
                                     </div>
                                     <div>
-                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Delete Job?</h2>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone.</p>
+                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{tr('Delete Job?', 'حذف الوظيفة؟')}</h2>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{tr('This action cannot be undone.', 'الإجراء ده مافيش رجوع فيه.')}</p>
                                     </div>
                                 </div>
 
                                 <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-4 mb-5 border border-gray-200 dark:border-gray-700">
-                                    <p className="text-gray-700 dark:text-gray-300 text-sm mb-1">You’re about to delete:</p>
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm mb-1">{tr("You're about to delete:", 'هتحذف:')}</p>
                                     <p className="font-semibold text-gray-900 dark:text-gray-100">{jobToDelete.title}</p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">{jobToDelete.company}</p>
                                 </div>
@@ -342,13 +342,13 @@ function RecruiterDashboard() {
                                         onClick={() => setJobToDelete(null)}
                                         className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
                                     >
-                                        Cancel
+                                        {tr('Cancel', 'إلغاء')}
                                     </button>
                                     <button
                                         onClick={confirmDeleteJob}
                                         className="px-5 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-semibold"
                                     >
-                                        Delete Job
+                                        {tr('Delete Job', 'احذف الوظيفة')}
                                     </button>
                                 </div>
                             </div>
@@ -360,7 +360,7 @@ function RecruiterDashboard() {
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                             <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 transition-colors">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Applications for: {selectedJob.title}</h2>
+                                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{tr('Applications for:', 'الطلبات على:')} {selectedJob.title}</h2>
                                     <button
                                         onClick={() => setSelectedJob(null)}
                                         className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl"
@@ -370,7 +370,7 @@ function RecruiterDashboard() {
                                 </div>
 
                                 {applications.length === 0 ? (
-                                    <p className="text-gray-600 dark:text-gray-400">No applications yet.</p>
+                                    <p className="text-gray-600 dark:text-gray-400">{tr('No applications yet.', 'مافيش طلبات لسه.')}</p>
                                 ) : (
                                     <div className="space-y-4">
                                         {applications.map((app) => (
@@ -384,7 +384,7 @@ function RecruiterDashboard() {
                                                             onClick={() => navigate(`/view-profile/${app.candidate_id}`)}
                                                             className="mt-2 text-primary dark:text-blue-400 hover:underline font-semibold text-sm"
                                                         >
-                                                            👤 View Full Profile
+                                                            👤 {tr('View Full Profile', 'عرض البروفايل الكامل')}
                                                         </button>
                                                     </div>
                                                     <StatusDropdown
@@ -396,7 +396,7 @@ function RecruiterDashboard() {
 
                                                 {app.cover_letter && (
                                                     <div className="mt-2">
-                                                        <p className="font-semibold text-gray-800 dark:text-gray-200">Cover Letter:</p>
+                                                        <p className="font-semibold text-gray-800 dark:text-gray-200">{tr('Cover Letter:', 'خطاب التقديم:')}</p>
                                                         <p className="text-gray-700 dark:text-gray-300">{app.cover_letter}</p>
                                                     </div>
                                                 )}
@@ -407,10 +407,10 @@ function RecruiterDashboard() {
                                                         rel="noopener noreferrer"
                                                         className="text-primary dark:text-blue-400 hover:underline mt-2 inline-block"
                                                     >
-                                                        📄 View Resume
+                                                        📄 {tr('View Resume', 'عرض السيرة الذاتية')}
                                                     </a>
                                                 )}
-                                                <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">Applied: {new Date(app.created_at).toLocaleDateString()}</p>
+                                                <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">{tr('Applied:', 'تم التقديم:')} {new Date(app.created_at).toLocaleDateString()}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -434,6 +434,15 @@ function StatusDropdown({ applicationId, currentStatus, onStatusChange }) {
     const [notes, setNotes] = useState('');
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [updating, setUpdating] = useState(false);
+    const { language } = useLanguage();
+    const tr = (en, ar) => (language === 'ar' ? ar : en);
+
+    const statusLabels = {
+        pending: tr('Pending', 'قيد الانتظار'),
+        reviewed: tr('Reviewed', 'تمت المراجعة'),
+        accepted: tr('Accepted', 'مقبول'),
+        rejected: tr('Rejected', 'مرفوض'),
+    };
 
     const handleStatusChange = async (newStatus) => {
         if (newStatus === currentStatus) return;
@@ -446,12 +455,12 @@ function StatusDropdown({ applicationId, currentStatus, onStatusChange }) {
         setUpdating(true);
         try {
             await updateApplicationStatus(applicationId, { status, notes });
-            toast.success('Application status updated! ✅');
+            toast.success(tr('Application status updated! ✅', 'تم تحديث حالة الطلب! ✅'));
             setShowNotesModal(false);
             setNotes('');
             onStatusChange();
         } catch (error) {
-            toast.error('Error updating status: ' + (error.response?.data?.error || error.message));
+            toast.error(tr('Error updating status: ', 'خطأ في تحديث الحالة: ') + (error.response?.data?.error || error.message));
             setStatus(currentStatus);
         }
         setUpdating(false);
@@ -474,29 +483,29 @@ function StatusDropdown({ applicationId, currentStatus, onStatusChange }) {
                 onChange={(e) => handleStatusChange(e.target.value)}
                 className={`px-3 py-1 rounded-full text-sm font-semibold border-2 ${getStatusColor(status)} focus:outline-none focus:ring-2 focus:ring-primary`}
             >
-                <option value="pending">Pending</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="accepted">Accepted</option>
-                <option value="rejected">Rejected</option>
+                <option value="pending">{statusLabels.pending}</option>
+                <option value="reviewed">{statusLabels.reviewed}</option>
+                <option value="accepted">{statusLabels.accepted}</option>
+                <option value="rejected">{statusLabels.rejected}</option>
             </select>
 
             {/* Notes Modal */}
             {showNotesModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 transition-colors">
-                        <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Update Application Status</h3>
+                        <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Update Application Status', 'تحديث حالة الطلب')}</h3>
                         <p className="text-gray-700 dark:text-gray-300 mb-4">
-                            Changing status to: <span className="font-semibold capitalize">{status}</span>
+                            {tr('Changing status to:', 'تغيير الحالة إلى:')} <span className="font-semibold capitalize">{statusLabels[status] || status}</span>
                         </p>
                         <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
-                            Add notes for the candidate (optional):
+                            {tr('Add notes for the candidate (optional):', 'أضف ملاحظات للمرشح (اختياري):')}
                         </label>
                         <textarea
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             rows="4"
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                            placeholder="Any feedback or next steps..."
+                            placeholder={tr('Any feedback or next steps...', 'أي ملاحظات أو خطوات تالية...')}
                         />
                         <div className="flex gap-4 mt-4">
                             <button
@@ -504,7 +513,7 @@ function StatusDropdown({ applicationId, currentStatus, onStatusChange }) {
                                 disabled={updating}
                                 className="flex-1 bg-primary dark:bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition disabled:opacity-50"
                             >
-                                {updating ? 'Updating...' : 'Confirm'}
+                                {updating ? tr('Updating...', 'جاري التحديث...') : tr('Confirm', 'تأكيد')}
                             </button>
                             <button
                                 onClick={() => {
@@ -514,7 +523,7 @@ function StatusDropdown({ applicationId, currentStatus, onStatusChange }) {
                                 }}
                                 className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
                             >
-                                Cancel
+                                {tr('Cancel', 'إلغاء')}
                             </button>
                         </div>
                     </div>

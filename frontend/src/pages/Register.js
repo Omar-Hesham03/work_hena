@@ -29,7 +29,8 @@ function Register() {
   });
 
   const { register } = useContext(AuthContext);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const tr = (en, ar) => (language === 'ar' ? ar : en);
   const navigate = useNavigate();
 
   // Real-time email validation
@@ -55,25 +56,25 @@ function Register() {
 
     if (touched.email && formData.email) {
       if (!validateEmail(formData.email)) {
-        newErrors.email = 'Please enter a valid email address';
+        newErrors.email = tr('Please enter a valid email address', 'من فضلك أدخل إيميل صالح');
       }
     }
 
     if (touched.full_name && formData.full_name) {
       if (formData.full_name.length < 2) {
-        newErrors.full_name = 'Name must be at least 2 characters';
+        newErrors.full_name = tr('Name must be at least 2 characters', 'الاسم لازم يكون حرفين على الأقل');
       }
     }
 
     if (touched.password && formData.password) {
       const { minLength, hasUppercase, hasLowercase, hasNumber } = passwordValidation;
       if (!minLength || !hasUppercase || !hasLowercase || !hasNumber) {
-        newErrors.password = 'Password does not meet requirements';
+        newErrors.password = tr('Password does not meet requirements', 'الباسورد لا يطابق المتطلبات');
       }
     }
 
     if (formData.user_type === 'recruiter' && touched.company_name && !formData.company_name) {
-      newErrors.company_name = 'Company name is required for recruiters';
+      newErrors.company_name = tr('Company name is required for recruiters', ' اسم الشركة مطلوب لمسؤولي التوظيف');
     }
 
     setErrors(newErrors);
@@ -127,7 +128,7 @@ function Register() {
       await register(formData);
       navigate('/');
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Registration failed';
+      const errorMessage = error.response?.data?.error || tr('Registration failed', 'فشل التسجيل');
       const errorDetails = error.response?.data?.details;
       if (errorDetails && errorDetails.length > 0) {
         toast.error(errorDetails[0]); // Show first validation error
@@ -234,19 +235,19 @@ function Register() {
               <div className="mt-3 space-y-2">
                 <PasswordRequirement
                   met={passwordValidation.minLength}
-                  text={t('register.passwordMinLength', 'At least 8 characters')}
+                  text={tr('At least 8 characters', '8 أحرف على الأقل')}
                 />
                 <PasswordRequirement
                   met={passwordValidation.hasUppercase}
-                  text={t('register.passwordUppercase', 'At least 1 uppercase letter')}
+                  text={tr('At least 1 uppercase letter', 'حرف كبير واحد على الأقل')}
                 />
                 <PasswordRequirement
                   met={passwordValidation.hasLowercase}
-                  text={t('register.passwordLowercase', 'At least 1 lowercase letter')}
+                  text={tr('At least 1 lowercase letter', 'حرف صغير واحد على الأقل')}
                 />
                 <PasswordRequirement
                   met={passwordValidation.hasNumber}
-                  text={t('register.passwordNumber', 'At least 1 number')}
+                  text={tr('At least 1 number', 'رقم واحد على الأقل')}
                 />
               </div>
             )}

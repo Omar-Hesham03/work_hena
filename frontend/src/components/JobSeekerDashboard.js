@@ -25,6 +25,13 @@ function JobSeekerDashboard() {
     }
   };
 
+  const statusLabels = {
+    pending: tr('Pending', 'قيد الانتظار'),
+    reviewed: tr('Reviewed', 'تمت المراجعة'),
+    accepted: tr('Accepted', 'مقبول'),
+    rejected: tr('Rejected', 'مرفوض'),
+  };
+
   const getStatusColor = (status) => {
     switch(status) {
       case 'pending': return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
@@ -88,7 +95,7 @@ function JobSeekerDashboard() {
                 
                 <div className="flex sm:block justify-center">
                   <span className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold ${getStatusColor(app.status)}`}>
-                    {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                    {statusLabels[app.status] || app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                   </span>
                 </div>
               </div>

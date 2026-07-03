@@ -155,7 +155,7 @@ const translations = {
       email: 'الإيميل',
       password: 'الباسورد',
       forgotPassword: 'نسيت الباسورد؟',
-      rememberMe: 'خلّيني داخل',
+      rememberMe: 'افتكرني',
       signIn: 'سجّل دخول',
       signingIn: 'جاري تسجيل الدخول...',
       noAccount: 'معندكش حساب؟',
@@ -170,7 +170,7 @@ const translations = {
       phone: 'الموبايل (اختياري)',
       role: 'أنا *',
       jobSeeker: 'باحث عن شغل',
-      recruiter: 'موظف توظيف',
+      recruiter: 'مسؤول توظيف',
       companyName: 'اسم الشركة *',
       createAccount: 'اعمل حساب',
       creating: 'جاري إنشاء الحساب...',
@@ -178,8 +178,8 @@ const translations = {
       signIn: 'سجّل دخول'
     },
     home: {
-      heroTitle: 'اعثر على شغلك الأحلام',
-      heroSubtitle: 'اتواصل مع شركات قوية وابدأ مشوارك المهني النهارده',
+      heroTitle: 'دور على وظيفة تناسبك',
+      heroSubtitle: 'اتواصل مع شركات قوية وابدأ مشوارك المهني النهاردا',
       aiPromptTitle: 'خد ترشيحات شغل بالذكاء الاصطناعي!',
       aiPromptBody: 'كمّل بروفايلك عشان تفتح ترشيحات مخصّصة على حسب مهاراتك وخبرتك وتفضيلاتك.',
       completeProfile: 'كمّل بروفايلك',
@@ -195,7 +195,7 @@ const translations = {
     },
     premium: {
       heroTag: 'بريميوم للفريلانسرز',
-      heroTitle: 'اختار الخطة اللي مناسبة ليك',
+      heroTitle: 'اختار الخطة المناسبة ليك',
       heroSubtitle: 'طلبات أكتر، ظهور أحسن، وتجربة أهدى بخطة معمولة للناس الجادين في التقديم.',
       summaryFree: 'الخطة المجانية',
       summaryPremium: 'البريميوم',

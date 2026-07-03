@@ -5,9 +5,12 @@ import { getMyProfile, saveProfile } from '../services/api';
 import Navbar from '../components/Navbar';
 import AvatarSelector from '../components/AvatarSelector';
 import { toast } from 'sonner';
+import { useLanguage } from '../context/LanguageContext';
 
 function Profile() {
   const { user, logout, updateAvatar, loading: authLoading } = useContext(AuthContext);
+  const { language } = useLanguage();
+  const tr = (en, ar) => (language === 'ar' ? ar : en);
   const navigate = useNavigate();
   const location = useLocation();
   const navigationContext = useContext(UNSAFE_NavigationContext);
@@ -54,7 +57,7 @@ function Profile() {
       return;
     }
     if (user.user_type !== 'job_seeker') {
-      toast.error('Only job seekers can create profiles');
+      toast.error(tr('Only job seekers can create profiles', 'فقط الباحثين عن عمل يقدروا يعملوا بروفايل'));
       navigate('/dashboard');
       return;
     }
@@ -167,7 +170,7 @@ function Profile() {
 
   const handleSaveProfile = async () => {
     if (profile.voice_intro_url && !profile.voice_intro_url.startsWith('https://vocaroo.com/')) {
-      toast.error('Voice Introduction must be a valid Vocaroo link (https://vocaroo.com/...)');
+      toast.error(tr('Voice Introduction must be a valid Vocaroo link (https://vocaroo.com/...)', 'التعريف الصوتي لازم يكون لينك Vocaroo صالح (https://vocaroo.com/...)'));
       return;
     }
 
@@ -181,14 +184,14 @@ function Profile() {
       // Save profile
       await saveProfile(profile);
       setHasUnsavedChanges(false);
-      toast.success('Profile saved successfully! 🎉');
+      toast.success(tr('Profile saved successfully! 🎉', 'تم حفظ البروفايل بنجاح! 🎉'));
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.message;
       const errorDetails = error.response?.data?.details;
       if (errorDetails && errorDetails.length > 0) {
         toast.error(errorDetails[0]);
       } else {
-        toast.error(`Error saving profile: ${errorMessage}`);
+        toast.error(tr(`Error saving profile: ${errorMessage}`, `خطأ في حفظ البروفايل: ${errorMessage}`));
       }
     }
     setSaving(false);
@@ -250,7 +253,7 @@ function Profile() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors">
-        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        <p className="text-gray-600 dark:text-gray-400">{tr('Loading...', 'جاري التحميل...')}</p>
       </div>
     );
   }
@@ -271,19 +274,19 @@ function Profile() {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">My Profile</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">{tr('My Profile', 'بروفايلي')}</h1>
           <button
             onClick={handleSaveProfile}
             disabled={saving}
             className="px-6 py-3 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold disabled:opacity-50"
           >
-            {saving ? 'Saving...' : 'Save Profile'}
+            {saving ? tr('Saving...', 'جاري الحفظ...') : tr('Save Profile', 'احفظ البروفايل')}
           </button>
         </div>
 
         {hasUnsavedChanges && (
           <div className="bg-yellow-100 dark:bg-yellow-900 border border-yellow-400 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded mb-6">
-            ⚠️ You have unsaved changes. Remember to save your profile!
+            ⚠️ {tr('You have unsaved changes. Remember to save your profile!', 'عندك تغييرات مش محفوظة. متنساش تحفظ البروفايل!')}
           </div>
         )}
 
@@ -298,10 +301,10 @@ function Profile() {
 
         {/* Basic Info */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Basic Information</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Basic Information', 'المعلومات الأساسية')}</h2>
 
           <div className="mb-4">
-            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Bio</label>
+            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Bio', 'نبذة')}</label>
             <textarea
               value={profile.bio || ''}
               onChange={(e) => {
@@ -310,7 +313,7 @@ function Profile() {
               }}
               rows="4"
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              placeholder="Tell recruiters about yourself..."
+              placeholder={tr('Tell recruiters about yourself...', 'احكي لجهات التوظيف عن نفسك...')}
             />
           </div>
 
@@ -325,13 +328,13 @@ function Profile() {
                       !
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Unsaved Changes</h2>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">You have changes that haven’t been saved yet.</p>
+                      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{tr('Unsaved Changes', 'تغييرات غير محفوظة')}</h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{tr("You have changes that haven't been saved yet.", 'عندك تغييرات لسه ما اتحفظتش.')}</p>
                     </div>
                   </div>
 
                   <p className="text-gray-700 dark:text-gray-300 mb-5">
-                    If you leave now, your latest edits will be lost.
+                    {tr('If you leave now, your latest edits will be lost.', 'لو خرجت دلوقتي، آخر تعديلاتك هتضيع.')}
                   </p>
 
                   <div className="flex gap-3 justify-end">
@@ -342,7 +345,7 @@ function Profile() {
                       }}
                       className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
                     >
-                      Stay Here
+                      {tr('Stay Here', 'ابقى هنا')}
                     </button>
                     <button
                       onClick={() => {
@@ -353,13 +356,13 @@ function Profile() {
                       }}
                       className="px-5 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-semibold"
                     >
-                      Leave Without Saving
+                      {tr('Leave Without Saving', 'اخرج من غير حفظ')}
                     </button>
                   </div>
                 </div>
               </div>
             )}
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Location</label>
+              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Location', 'المكان')}</label>
               <input
                 type="text"
                 value={profile.location || ''}
@@ -368,12 +371,12 @@ function Profile() {
                   setHasUnsavedChanges(true);
                 }}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="City, Country"
+                placeholder={tr('City, Country', 'المدينة، الدولة')}
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Availability</label>
+              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Availability', 'التوفر')}</label>
               <select
                 value={profile.availability || 'Available'}
                 onChange={(e) => {
@@ -382,10 +385,10 @@ function Profile() {
                 }}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
-                <option value="immediate">Available</option>
-                <option value="2-weeks">Available in 2 weeks</option>
-                <option value="1-month">Available in 1 month</option>
-                <option value="not-available">Not actively looking</option>
+                <option value="immediate">{tr('Available', 'متاح')}</option>
+                <option value="2-weeks">{tr('Available in 2 weeks', 'متاح خلال أسبوعين')}</option>
+                <option value="1-month">{tr('Available in 1 month', 'متاح خلال شهر')}</option>
+                <option value="not-available">{tr('Not actively looking', 'مش بدور بنشاط')}</option>
               </select>
             </div>
           </div>
@@ -393,7 +396,7 @@ function Profile() {
 
         {/* Skills */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Skills</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Skills', 'المهارات')}</h2>
 
           <div className="flex gap-2 mb-4">
             <input
@@ -402,10 +405,10 @@ function Profile() {
               onChange={(e) => setNewSkill(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
               className="flex-1 min-w-0 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              placeholder="Add a skill, language..."
+              placeholder={tr('Add a skill, language...', 'أضف مهارة أو لغة...')}
             />
             <button onClick={addSkill} type="button" className="px-4 py-2 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 whitespace-nowrap flex-shrink-0">
-              Add
+              {tr('Add', 'أضف')}
             </button>
           </div>
 
@@ -421,7 +424,7 @@ function Profile() {
 
         {/* Experience */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Work Experience</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Work Experience', 'الخبرة العملية')}</h2>
 
           <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4 bg-gray-50 dark:bg-gray-800">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -429,28 +432,28 @@ function Profile() {
                 type="text"
                 value={experienceForm.company}
                 onChange={(e) => setExperienceForm({ ...experienceForm, company: e.target.value })}
-                placeholder="Company"
+                placeholder={tr('Company', 'الشركة')}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
               <input
                 type="text"
                 value={experienceForm.position}
                 onChange={(e) => setExperienceForm({ ...experienceForm, position: e.target.value })}
-                placeholder="Position"
+                placeholder={tr('Position', 'المنصب')}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
               <input
                 type="month"
                 value={experienceForm.start_date}
                 onChange={(e) => setExperienceForm({ ...experienceForm, start_date: e.target.value })}
-                placeholder="Start Date"
+                placeholder={tr('Start Date', 'تاريخ البداية')}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
               <input
                 type="month"
                 value={experienceForm.end_date}
                 onChange={(e) => setExperienceForm({ ...experienceForm, end_date: e.target.value })}
-                placeholder="End Date"
+                placeholder={tr('End Date', 'تاريخ النهاية')}
                 disabled={experienceForm.current}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:bg-gray-100 dark:disabled:bg-gray-600"
               />
@@ -462,17 +465,17 @@ function Profile() {
                 onChange={(e) => setExperienceForm({ ...experienceForm, current: e.target.checked, end_date: e.target.checked ? '' : experienceForm.end_date })}
                 className="bg-white dark:bg-gray-700"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">I currently work here</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{tr('I currently work here', 'أنا شغال هنا دلوقتي')}</span>
             </label>
             <textarea
               value={experienceForm.description}
               onChange={(e) => setExperienceForm({ ...experienceForm, description: e.target.value })}
-              placeholder="Description"
+              placeholder={tr('Description', 'الوصف')}
               rows="3"
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             />
             <button onClick={addExperience} type="button" className="px-4 py-2 bg-secondary dark:bg-green-600 text-white rounded-lg hover:bg-green-600 dark:hover:bg-green-700">
-              + Add Experience
+              + {tr('Add Experience', 'أضف خبرة')}
             </button>
           </div>
 
@@ -484,7 +487,7 @@ function Profile() {
                     <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{exp.position}</h3>
                     <p className="text-primary dark:text-blue-400">{exp.company}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {exp.start_date} - {exp.current ? 'Present' : exp.end_date}
+                      {exp.start_date} - {exp.current ? tr('Present', 'حتى الآن') : exp.end_date}
                     </p>
                     <p className="text-gray-700 dark:text-gray-300 mt-2">{exp.description}</p>
                   </div>
@@ -499,7 +502,7 @@ function Profile() {
 
         {/* Education */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Education</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Education', 'التعليم')}</h2>
 
           <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4 bg-gray-50 dark:bg-gray-800">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -507,35 +510,35 @@ function Profile() {
                 type="text"
                 value={educationForm.institution}
                 onChange={(e) => setEducationForm({ ...educationForm, institution: e.target.value })}
-                placeholder="Institution"
+                placeholder={tr('Institution', 'المؤسسة')}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
               <input
                 type="text"
                 value={educationForm.degree}
                 onChange={(e) => setEducationForm({ ...educationForm, degree: e.target.value })}
-                placeholder="Degree"
+                placeholder={tr('Degree', 'الدرجة')}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
               <input
                 type="text"
                 value={educationForm.field}
                 onChange={(e) => setEducationForm({ ...educationForm, field: e.target.value })}
-                placeholder="Field of Study"
+                placeholder={tr('Field of Study', 'مجال الدراسة')}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
               <input
                 type="month"
                 value={educationForm.start_date}
                 onChange={(e) => setEducationForm({ ...educationForm, start_date: e.target.value })}
-                placeholder="Start Date"
+                placeholder={tr('Start Date', 'تاريخ البداية')}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
               <input
                 type="month"
                 value={educationForm.end_date}
                 onChange={(e) => setEducationForm({ ...educationForm, end_date: e.target.value })}
-                placeholder="End Date"
+                placeholder={tr('End Date', 'تاريخ النهاية')}
                 disabled={educationForm.current}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 disabled:bg-gray-100 dark:disabled:bg-gray-600"
               />
@@ -547,10 +550,10 @@ function Profile() {
                 onChange={(e) => setEducationForm({ ...educationForm, current: e.target.checked, end_date: e.target.checked ? '' : educationForm.end_date })}
                 className="bg-white dark:bg-gray-700"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">I'm currently studying here</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{tr("I'm currently studying here", 'أنا بدرس هنا دلوقتي')}</span>
             </label>
             <button onClick={addEducation} type="button" className="px-4 py-2 bg-secondary dark:bg-green-600 text-white rounded-lg hover:bg-green-600 dark:hover:bg-green-700">
-              + Add Education
+              + {tr('Add Education', 'أضف تعليم')}
             </button>
           </div>
 
@@ -563,7 +566,7 @@ function Profile() {
                     <p className="text-primary dark:text-blue-400">{edu.institution}</p>
                     {edu.field && <p className="text-gray-600 dark:text-gray-400">{edu.field}</p>}
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {edu.start_date} - {edu.current ? 'Present' : edu.end_date}
+                      {edu.start_date} - {edu.current ? tr('Present', 'حتى الآن') : edu.end_date}
                     </p>
                   </div>
                   <button onClick={() => removeEducation(index)} className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-600">
@@ -577,7 +580,7 @@ function Profile() {
 
         {/* Portfolio Links */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Portfolio & Projects</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Portfolio & Projects', 'الأعمال والمشاريع')}</h2>
 
           <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4 bg-gray-50 dark:bg-gray-800">
             <div className="grid grid-cols-1 gap-4 mb-4">
@@ -585,7 +588,7 @@ function Profile() {
                 type="text"
                 value={portfolioForm.title}
                 onChange={(e) => setPortfolioForm({ ...portfolioForm, title: e.target.value })}
-                placeholder="Project Title"
+                placeholder={tr('Project Title', 'عنوان المشروع')}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
               <input
@@ -598,13 +601,13 @@ function Profile() {
               <textarea
                 value={portfolioForm.description}
                 onChange={(e) => setPortfolioForm({ ...portfolioForm, description: e.target.value })}
-                placeholder="Description"
+                placeholder={tr('Description', 'الوصف')}
                 rows="2"
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
             <button onClick={addPortfolio} type="button" className="px-4 py-2 bg-secondary dark:bg-green-600 text-white rounded-lg hover:bg-green-600 dark:hover:bg-green-700">
-              + Add Portfolio Item
+              + {tr('Add Portfolio Item', 'أضف عنصر للأعمال')}
             </button>
           </div>
 
@@ -630,11 +633,11 @@ function Profile() {
 
         {/* Social Links */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Links</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Links', 'الروابط')}</h2>
 
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Resume/CV Link</label>
+              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Resume/CV Link', 'لينك السيرة الذاتية')}</label>
               <input
                 type="url"
                 value={profile.resume_link || ''}
@@ -643,12 +646,12 @@ function Profile() {
                   setHasUnsavedChanges(true);
                 }}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                placeholder="Link to your resume (Google Drive, Dropbox, etc.)"
+                placeholder={tr('Link to your resume (Google Drive, Dropbox, etc.)', 'لينك السيرة الذاتية (Google Drive، Dropbox، إلخ)')}
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Voice Introduction</label>
+              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Voice Introduction', 'تعريف صوتي')}</label>
               <input
                 type="url"
                 value={profile.voice_intro_url || ''}
@@ -662,7 +665,7 @@ function Profile() {
             </div>
 
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">LinkedIn</label>
+              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('LinkedIn', 'LinkedIn')}</label>
               <input
                 type="url"
                 value={profile.linkedin_url || ''}
@@ -676,7 +679,7 @@ function Profile() {
             </div>
 
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">GitHub</label>
+              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('GitHub', 'GitHub')}</label>
               <input
                 type="url"
                 value={profile.github_url || ''}
@@ -690,7 +693,7 @@ function Profile() {
             </div>
 
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Personal Website</label>
+              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Personal Website', 'الموقع الشخصي')}</label>
               <input
                 type="url"
                 value={profile.website_url || ''}
@@ -710,7 +713,7 @@ function Profile() {
           disabled={saving}
           className="w-full py-4 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold text-lg disabled:opacity-50"
         >
-          {saving ? 'Saving Profile...' : 'Save Profile'}
+          {saving ? tr('Saving Profile...', 'جاري حفظ البروفايل...') : tr('Save Profile', 'احفظ البروفايل')}
         </button>
       </div>
     </div>

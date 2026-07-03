@@ -37,7 +37,7 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
             setPlans(uniquePlans);
         } catch (error) {
             console.error('Error fetching plans:', error);
-            toast.error('Failed to load subscription plans');
+            toast.error(tr('Failed to load subscription plans', 'فشل تحميل خطط الاشتراك'));
         }
     };
 
@@ -60,7 +60,7 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
                 const checkPaymentWindow = setInterval(() => {
                     if (paymentWindow.closed) {
                         clearInterval(checkPaymentWindow);
-                        toast.info('Payment window closed. Checking status...');
+                        toast.info(tr('Payment window closed. Checking status...', 'اتقفلت نافذة الدفع. جاري التحقق من الحالة...'));
                         // Refresh page or fetch updated subscription status
                         setTimeout(() => {
                             window.location.reload();
@@ -70,7 +70,7 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
             }
         } catch (error) {
             console.error('Error initiating purchase:', error);
-            toast.error(error.response?.data?.error || 'Failed to initiate purchase');
+            toast.error(error.response?.data?.error || tr('Failed to initiate purchase', 'فشل بدء عملية الشراء'));
         } finally {
             setLoading(false);
             setSelectedPlan(null);
@@ -85,10 +85,10 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
     const getPlanHighlights = (plan) => {
         const features = plan.features || {};
         const highlights = [
-            `${features.daily_applications || 20} applications/day`,
-            features.priority_search ? 'Priority search boost' : 'Standard search visibility',
-            features.premium_badge ? 'Premium badge' : null,
-            features.ads === false ? 'No ads' : null
+            tr(`${features.daily_applications || 20} applications/day`, `${features.daily_applications || 20} طلب/اليوم`),
+            features.priority_search ? tr('Priority search boost', 'أولوية في البحث') : tr('Standard search visibility', 'ظهور عادي في البحث'),
+            features.premium_badge ? tr('Premium badge', 'بادج بريميوم') : null,
+            features.ads === false ? tr('No ads', 'من غير إعلانات') : null
         ].filter(Boolean);
 
         return highlights;
@@ -226,8 +226,8 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
                                             </p>
                                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                                 {plan.duration_months === 1
-                                                    ? `${pricePerMonth} EGP for ${durationLabel}`
-                                                    : `~${pricePerMonth} EGP per month`
+                                                    ? tr(`${pricePerMonth} EGP for ${durationLabel}`, `${pricePerMonth} جنيه لمدة ${durationLabel}`)
+                                                    : tr(`~${pricePerMonth} EGP per month`, `~${pricePerMonth} جنيه/الشهر`)
                                                 }
                                             </p>
                                         </div>
@@ -253,7 +253,7 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
 
                                         <div className="mt-auto pt-5">
                                             <div className="rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-600 dark:bg-slate-950/60 dark:text-slate-400">
-                                                Premium access lasts for <span className="font-bold text-slate-900 dark:text-white">{durationLabel}</span> {t('premium.durationSuffix')}.
+                                                {tr('Premium access lasts for', 'الوصول البريميوم يستمر لمدة')} <span className="font-bold text-slate-900 dark:text-white">{durationLabel}</span> {t('premium.durationSuffix')}.
                                             </div>
 
                                             <button
@@ -281,7 +281,7 @@ function PremiumUpgradeModal({ isOpen, onClose, currentTier }) {
 
                                             {isFirstTime && savings > 0 && (
                                                 <p className="mt-3 text-center text-xs font-medium text-emerald-700 dark:text-emerald-300">
-                                                    Save {parseFloat(savings).toFixed(0)} EGP on your first purchase.
+                                                    {tr(`Save ${parseFloat(savings).toFixed(0)} EGP on your first purchase.`, `وفّر ${parseFloat(savings).toFixed(0)} جنيه في أول عملية شراء.`)}
                                                 </p>
                                             )}
                                             {isFirstTime && originalPrice > price && (

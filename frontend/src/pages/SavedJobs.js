@@ -14,6 +14,10 @@ function SavedJobs() {
   const { language } = useLanguage();
   const navigate = useNavigate();
   const tr = (en, ar) => (language === 'ar' ? ar : en);
+  const stripHtmlAndTruncate = (html, maxLength = 150) => {
+    const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
 
   useEffect(() => {
     // Wait for auth to finish loading
@@ -92,7 +96,7 @@ function SavedJobs() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Saved Jobs</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">{tr('Saved Jobs', 'الوظايف المحفوظة')}</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">{tr("Jobs you've bookmarked for later", 'الوظايف اللي حفظتها للرجوع لها لاحقًا')}</p>
         </div>
 
@@ -138,7 +142,7 @@ function SavedJobs() {
                   {job.salary_range && (
                     <p className="text-secondary dark:text-green-400 font-semibold mb-3">💰 {job.salary_range}</p>
                   )}
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{job.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{stripHtmlAndTruncate(job.description, 150)}</p>
 
                   <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
                     {tr('Saved on', 'تم الحفظ في')} {new Date(savedJob.created_at).toLocaleDateString()}

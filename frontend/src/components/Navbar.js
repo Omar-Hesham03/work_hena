@@ -60,22 +60,22 @@ function Navbar() {
 
     return (
         <>
-            <nav className="bg-white dark:bg-gray-800 shadow-md transition-colors sticky top-0 z-40">
-                <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
-                    <div className="flex justify-between items-center">
+            <nav className="bg-white dark:bg-gray-800 shadow-md transition-colors sticky top-0 z-40 overflow-x-clip">
+                <div className="container mx-auto max-w-full px-1.5 sm:px-4 py-2.5 sm:py-4">
+                    <div className="flex justify-between items-center gap-1.5 sm:gap-3 min-w-0">
                         {/* Logo */}
                         <h1
-                            className="text-lg sm:text-xl md:text-2xl font-bold text-primary dark:text-blue-400 cursor-pointer"
+                            className="text-base sm:text-xl md:text-2xl font-bold text-primary dark:text-blue-400 cursor-pointer shrink min-w-0 truncate"
                             onClick={() => navigate('/')}
                         >
                             JobBoard
                         </h1>
 
                         {/* Right Side Actions */}
-                        <div className="flex gap-1.5 sm:gap-2 md:gap-3 items-center">
+                        <div className="flex gap-1 sm:gap-2 md:gap-3 items-center shrink-0">
                             <button
                                 onClick={toggleLanguage}
-                                className="h-9 min-w-9 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                                className="h-8 sm:h-9 min-w-8 sm:min-w-9 px-2 sm:px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-[11px] sm:text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition"
                                 title={t('navbar.languageTitle')}
                             >
                                 {language === 'en' ? 'عربي' : 'EN'}
@@ -104,16 +104,16 @@ function Navbar() {
                                     onNavigate={handleNavigationWithWarning}
                                 />
                             ) : (
-                                <div className="flex gap-2">
+                                <div className="flex gap-1.5 sm:gap-2">
                                     <button
                                         onClick={() => navigate('/login')}
-                                        className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                                        className="px-2.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-base text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition whitespace-nowrap"
                                     >
                                         {t('navbar.login')}
                                     </button>
                                     <button
                                         onClick={() => navigate('/register')}
-                                        className="px-3 py-1.5 sm:px-6 sm:py-2 text-sm sm:text-base bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition"
+                                        className="px-2.5 py-1.5 sm:px-6 sm:py-2 text-xs sm:text-base bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition whitespace-nowrap"
                                     >
                                         {t('navbar.signUp')}
                                     </button>

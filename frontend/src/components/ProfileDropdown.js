@@ -7,7 +7,33 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
+  const [dropdownStyle, setDropdownStyle] = useState({});
   const { language, t } = useLanguage();
+
+  useEffect(() => {
+    if (!showDropdown || !buttonRef.current) {
+      return;
+    }
+
+    const updatePosition = () => {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownStyle(
+        language === 'ar'
+          ? { top: rect.bottom + 8, left: rect.left }
+          : { top: rect.bottom + 8, right: window.innerWidth - rect.right }
+      );
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [showDropdown, language]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -33,9 +59,8 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
 
   const firstName = user.full_name.split(' ')[0];
   const userTypeDisplay = language === 'ar'
-    ? (user.user_type === 'recruiter' ? '[موظف توظيف]' : user.user_type === 'admin' ? '[أدمن]' : '[فريلانسر]')
+    ? (user.user_type === 'recruiter' ? '[مسؤول توظيف]' : user.user_type === 'admin' ? '[أدمن]' : '[فريلانسر]')
     : (user.user_type === 'recruiter' ? '[Recruiter]' : user.user_type === 'admin' ? '[Admin]' : '[Freelancer]');
-  const dropdownSideClass = language === 'ar' ? 'left-0 right-auto' : 'right-0';
   const dropdownTextClass = language === 'ar' ? 'text-right' : 'text-left';
   const isVerified = Boolean(user.email_verified);
   const verificationBadge = isVerified
@@ -66,6 +91,7 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
     <div className="relative" ref={dropdownRef}>
       {/* Avatar Button */}
       <button
+        ref={buttonRef}
         onClick={() => setShowDropdown(!showDropdown)}
         className="flex items-center gap-2 hover:opacity-80 transition"
       >
@@ -75,14 +101,16 @@ function ProfileDropdown({ user, onLogout, onNavigate }) {
       {/* Dropdown Menu */}
       {showDropdown && (
         <>
-          {/* Backdrop for mobile */}
           <div
-            className="fixed inset-0 z-10 md:hidden"
+            className="fixed inset-0 z-40"
             onClick={() => setShowDropdown(false)}
           />
 
-          {/* Dropdown Content */}
-          <div dir={language === 'ar' ? 'rtl' : 'ltr'} className={`absolute ${dropdownSideClass} mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-2xl z-20 border border-gray-200 dark:border-gray-700 overflow-hidden ${dropdownTextClass}`}>
+          <div
+            dir={language === 'ar' ? 'rtl' : 'ltr'}
+            style={dropdownStyle}
+            className={`fixed w-64 bg-white dark:bg-gray-800 rounded-lg shadow-2xl z-50 border border-gray-200 dark:border-gray-700 overflow-hidden ${dropdownTextClass}`}
+          >
             {/* User Info Header */}
             <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">

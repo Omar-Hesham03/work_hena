@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { getAdminJobs, deleteAdminJob, updateJobStatus } from '../../services/api';
 import { toast } from 'sonner';
+import { useLanguage } from '../../context/LanguageContext';
 
 function JobsManagement() {
+  const { language } = useLanguage();
+  const tr = (en, ar) => (language === 'ar' ? ar : en);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
@@ -45,12 +48,12 @@ function JobsManagement() {
 
     try {
       await deleteAdminJob(jobToDelete.id, deleteReason.trim() || undefined);
-      toast.success(deleteReason.trim() ? 'Job deleted and recruiter notified! 📧' : 'Job deleted! 🗑️');
+      toast.success(deleteReason.trim() ? tr('Job deleted and recruiter notified! 📧', 'تم حذف الوظيفة وإبلاغ جهة التوظيف! 📧') : tr('Job deleted! 🗑️', 'تم حذف الوظيفة! 🗑️'));
       setJobToDelete(null);
       setDeleteReason('');
       fetchJobs();
     } catch (error) {
-      toast.error('Error deleting job: ' + (error.response?.data?.error || error.message));
+      toast.error(tr('Error deleting job: ', 'خطأ في حذف الوظيفة: ') + (error.response?.data?.error || error.message));
     }
   };
 
@@ -63,11 +66,11 @@ function JobsManagement() {
 
     try {
       await updateJobStatus(jobToUpdate.id, jobToUpdate.newStatus);
-      toast.success('Job status updated! ✅');
+      toast.success(tr('Job status updated! ✅', 'تم تحديث حالة الوظيفة! ✅'));
       setJobToUpdate(null);
       fetchJobs();
     } catch (error) {
-      toast.error('Error updating job: ' + (error.response?.data?.error || error.message));
+      toast.error(tr('Error updating job: ', 'خطأ في تحديث الوظيفة: ') + (error.response?.data?.error || error.message));
     }
   };
 
@@ -86,26 +89,26 @@ function JobsManagement() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Status</label>
+            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Status', 'الحالة')}</label>
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
-              <option value="all">All Jobs</option>
-              <option value="open">Open</option>
-              <option value="closed">Closed</option>
-              <option value="filled">Filled</option>
+              <option value="all">{tr('All Jobs', 'كل الوظايف')}</option>
+              <option value="open">{tr('Open', 'مفتوحة')}</option>
+              <option value="closed">{tr('Closed', 'مغلقة')}</option>
+              <option value="filled">{tr('Filled', 'تم شغلها')}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Search</label>
+            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Search', 'بحث')}</label>
             <input
               type="text"
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              placeholder="Search by title or company..."
+              placeholder={tr('Search by title or company...', 'ابحث بالمسمى أو الشركة...')}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
@@ -116,11 +119,11 @@ function JobsManagement() {
       <div className="space-y-4">
         {loading ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center text-gray-600 dark:text-gray-400">
-            Loading jobs...
+            {tr('Loading jobs...', 'جاري تحميل الوظايف...')}
           </div>
         ) : jobs.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center text-gray-600 dark:text-gray-400">
-            No jobs found
+            {tr('No jobs found', 'مافيش وظايف')}
           </div>
         ) : (
           <>
@@ -142,9 +145,9 @@ function JobsManagement() {
                     onChange={(e) => handleUpdateStatus(job, e.target.value)}
                     className={`px-3 py-1 rounded-full text-xs font-semibold border-2 ${getStatusColor(job.status)}`}
                   >
-                    <option value="open">Open</option>
-                    <option value="closed">Closed</option>
-                    <option value="filled">Filled</option>
+                    <option value="open">{tr('Open', 'مفتوحة')}</option>
+                    <option value="closed">{tr('Closed', 'مغلقة')}</option>
+                    <option value="filled">{tr('Filled', 'تم شغلها')}</option>
                   </select>
                 </div>
 
@@ -153,7 +156,7 @@ function JobsManagement() {
                 <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="text-sm">
                     <p className="text-gray-600 dark:text-gray-400">
-                      Posted by: <span className="font-semibold text-gray-800 dark:text-gray-200">{job.users.full_name}</span>
+                      {tr('Posted by:', 'نُشرت بواسطة:')} <span className="font-semibold text-gray-800 dark:text-gray-200">{job.users.full_name}</span>
                     </p>
                     <p className="text-gray-500 dark:text-gray-500">
                       {new Date(job.created_at).toLocaleDateString()}
@@ -164,7 +167,7 @@ function JobsManagement() {
                     onClick={() => handleDeleteJob(job)}
                     className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition font-semibold"
                   >
-                    Delete Job
+                    {tr('Delete Job', 'احذف الوظيفة')}
                   </button>
                 </div>
               </div>
@@ -173,7 +176,7 @@ function JobsManagement() {
             {/* Pagination */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md px-6 py-4 flex justify-between items-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Page {pagination.page} of {pagination.totalPages} ({pagination.total} total jobs)
+                {tr('Page', 'صفحة')} {pagination.page} {tr('of', 'من')} {pagination.totalPages} ({pagination.total} {tr('total jobs', 'وظيفة إجمالي')})
               </p>
               <div className="flex gap-2">
                 <button
@@ -181,14 +184,14 @@ function JobsManagement() {
                   disabled={pagination.page === 1}
                   className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Previous
+                  {tr('Previous', 'السابق')}
                 </button>
                 <button
                   onClick={() => setPagination({ ...pagination, page: pagination.page + 1 })}
                   disabled={pagination.page >= pagination.totalPages}
                   className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Next
+                  {tr('Next', 'التالي')}
                 </button>
               </div>
             </div>
@@ -205,24 +208,24 @@ function JobsManagement() {
                 !
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Delete Job?</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone.</p>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{tr('Delete Job?', 'حذف الوظيفة؟')}</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{tr('This action cannot be undone.', 'الإجراء ده مافيش رجوع فيه.')}</p>
               </div>
             </div>
 
             <div className="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-4 mb-5 border border-gray-200 dark:border-gray-700">
-              <p className="text-gray-700 dark:text-gray-300 text-sm mb-1">You’re about to delete:</p>
+              <p className="text-gray-700 dark:text-gray-300 text-sm mb-1">{tr("You're about to delete:", 'هتحذف:')}</p>
               <p className="font-semibold text-gray-900 dark:text-gray-100">{jobToDelete.title}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">{jobToDelete.company}</p>
             </div>
 
-            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Reason (optional)</label>
+            <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">{tr('Reason (optional)', 'السبب (اختياري)')}</label>
             <textarea
               value={deleteReason}
               onChange={(e) => setDeleteReason(e.target.value)}
               rows="3"
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 mb-5"
-              placeholder="Why are you removing this job?"
+              placeholder={tr('Why are you removing this job?', 'ليه بتشيل الوظيفة دي؟')}
             />
 
             <div className="flex gap-3 justify-end">
@@ -233,13 +236,13 @@ function JobsManagement() {
                 }}
                 className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
               >
-                Cancel
+                {tr('Cancel', 'إلغاء')}
               </button>
               <button
                 onClick={confirmDeleteJob}
                 className="px-5 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-semibold"
               >
-                Delete Job
+                {tr('Delete Job', 'احذف الوظيفة')}
               </button>
             </div>
           </div>
@@ -250,9 +253,9 @@ function JobsManagement() {
       {jobToUpdate && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 transition-colors shadow-2xl">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">Update Status?</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">{tr('Update Status?', 'تحديث الحالة؟')}</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-5">
-              Change <span className="font-semibold">{jobToUpdate.title}</span> status to <span className="font-semibold capitalize">{jobToUpdate.newStatus}</span>?
+              {tr('Change', 'تغيير')} <span className="font-semibold">{jobToUpdate.title}</span> {tr('status to', 'الحالة إلى')} <span className="font-semibold capitalize">{jobToUpdate.newStatus}</span>?
             </p>
 
             <div className="flex gap-3 justify-end">
@@ -260,13 +263,13 @@ function JobsManagement() {
                 onClick={() => setJobToUpdate(null)}
                 className="px-5 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition font-semibold"
               >
-                Cancel
+                {tr('Cancel', 'إلغاء')}
               </button>
               <button
                 onClick={confirmUpdateStatus}
                 className="px-5 py-2.5 rounded-lg bg-primary text-white hover:bg-blue-600 transition font-semibold"
               >
-                Confirm
+                {tr('Confirm', 'تأكيد')}
               </button>
             </div>
           </div>

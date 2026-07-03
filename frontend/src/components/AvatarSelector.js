@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 // Available avatar options
 const AVATARS = [
@@ -22,6 +23,8 @@ const AVATARS = [
 
 function AvatarSelector({ currentAvatar, onSelect }) {
   const [selectedAvatar, setSelectedAvatar] = useState(currentAvatar);
+  const { language } = useLanguage();
+  const tr = (en, ar) => (language === 'ar' ? ar : en);
 
   const handleSelect = (avatar) => {
     setSelectedAvatar(avatar.id);
@@ -30,7 +33,7 @@ function AvatarSelector({ currentAvatar, onSelect }) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 transition-colors">
-      <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Choose Your Avatar</h2>
+      <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">{tr('Choose Your Avatar', 'اختار الأفاتار بتاعك')}</h2>
       
       <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
         {AVATARS.map((avatar) => (
@@ -42,7 +45,7 @@ function AvatarSelector({ currentAvatar, onSelect }) {
               ${avatar.color} hover:scale-110 transition-transform
               ${selectedAvatar === avatar.id ? 'ring-4 ring-primary dark:ring-blue-400' : ''}
             `}
-            title={`Select ${avatar.emoji} avatar`}
+            title={tr(`Select ${avatar.emoji} avatar`, `اختار أفاتار ${avatar.emoji}`)}
           >
             {avatar.emoji}
           </button>
@@ -52,7 +55,7 @@ function AvatarSelector({ currentAvatar, onSelect }) {
       {selectedAvatar && (
         <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <p className="text-sm text-gray-700 dark:text-gray-300">
-            ✓ Avatar selected! Remember to save your profile to apply changes.
+            ✓ {tr('Avatar selected! Remember to save your profile to apply changes.', 'تم اختيار الأفاتار! متنساش تحفظ البروفايل عشان التغييرات تتطبق.')}
           </p>
         </div>
       )}

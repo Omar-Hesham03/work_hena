@@ -17,19 +17,20 @@ import { Helmet } from 'react-helmet-async';
 const SITE_NAME = 'WorkHena';
 const PUBLIC_URL = process.env.REACT_APP_PUBLIC_URL || '';
 
-// Helper function for match badge colors
-const getMatchLevel = (percentage) => {
-  if (percentage >= 85) return { level: 'Excellent', color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900' };
-  if (percentage >= 70) return { level: 'Great', color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-100 dark:bg-blue-900' };
-  if (percentage >= 55) return { level: 'Good', color: 'text-yellow-600 dark:text-yellow-400', bgColor: 'bg-yellow-100 dark:bg-yellow-900' };
-  if (percentage >= 40) return { level: 'Fair', color: 'text-orange-600 dark:text-orange-400', bgColor: 'bg-orange-100 dark:bg-orange-900' };
-  return { level: 'Low', color: 'text-gray-600 dark:text-gray-400', bgColor: 'bg-gray-100 dark:bg-gray-700' };
-};
 function Home() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, logout, loading: authLoading } = useContext(AuthContext);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const tr = (en, ar) => (language === 'ar' ? ar : en);
+
+  const getMatchLevel = (percentage) => {
+    if (percentage >= 85) return { level: tr('Excellent', 'ممتاز'), color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900' };
+    if (percentage >= 70) return { level: tr('Great', 'رائع'), color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-100 dark:bg-blue-900' };
+    if (percentage >= 55) return { level: tr('Good', 'جيد'), color: 'text-yellow-600 dark:text-yellow-400', bgColor: 'bg-yellow-100 dark:bg-yellow-900' };
+    if (percentage >= 40) return { level: tr('Fair', 'مقبول'), color: 'text-orange-600 dark:text-orange-400', bgColor: 'bg-orange-100 dark:bg-orange-900' };
+    return { level: tr('Low', 'ضعيف'), color: 'text-gray-600 dark:text-gray-400', bgColor: 'bg-gray-100 dark:bg-gray-700' };
+  };
   const navigate = useNavigate();
 
   const showAIFeatures = user && user.user_type === 'job_seeker';
@@ -157,7 +158,7 @@ function Home() {
       return;
     }
     if (user.user_type !== 'job_seeker') {
-      toast.error('Only job seekers can apply to jobs');
+      toast.error(tr('Only job seekers can apply to jobs', 'فقط الباحثين عن عمل يقدروا يقدّموا على الوظايف'));
       return;
     }
     navigate(`/apply/${jobId}`);
@@ -172,7 +173,7 @@ function Home() {
     }
 
     if (user.user_type !== 'job_seeker') {
-      toast.error('Only job seekers can save jobs');
+      toast.error(tr('Only job seekers can save jobs', 'فقط الباحثين عن عمل يقدروا يحفظوا الوظايف'));
       return;
     }
 
@@ -189,7 +190,7 @@ function Home() {
         setSavedJobIds(prev => new Set(prev).add(jobId));
       }
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Error saving job');
+      toast.error(error.response?.data?.error || tr('Error saving job', 'حصل خطأ أثناء حفظ الوظيفة'));
     }
   };
 
@@ -199,7 +200,7 @@ function Home() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors overflow-x-hidden">
       <Helmet>
         <title>WorkHena | Jobs, Hiring, and Career Growth</title>
         <meta
@@ -263,12 +264,12 @@ function Home() {
       {/* Search & Filters */}
       <section className="container mx-auto px-4 py-6 sm:py-8">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6 transition-colors">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center mb-4">
             <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100">{t('home.searchTitle')}</h2>
 
             {/* Sort Toggle - Only show if AI features are enabled (setup pending for free users logic later maybe) */}
             {showAIFeatures && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 shrink-0">
                 <button
                   onClick={() => setSortBy('recommended')}
                   className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${sortBy === 'recommended'
@@ -319,10 +320,10 @@ function Home() {
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="">{t('home.jobTypePlaceholder')}</option>
-                <option value="full-time">Full-time</option>
-                <option value="part-time">Part-time</option>
-                <option value="contract">Contract</option>
-                <option value="flexible">Flexible</option>
+                <option value="full-time">{tr('Full-time', 'دوام كامل')}</option>
+                <option value="part-time">{tr('Part-time', 'دوام جزئي')}</option>
+                <option value="contract">{tr('Contract', 'عقد')}</option>
+                <option value="flexible">{tr('Flexible', 'مرن')}</option>
               </select>
             </div>
 
@@ -333,9 +334,9 @@ function Home() {
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="">{t('home.workModePlaceholder')}</option>
-                <option value="on-site">On-site</option>
-                <option value="remote">Remote</option>
-                <option value="hybrid">Hybrid</option>
+                <option value="on-site">{tr('On-site', 'في المقر')}</option>
+                <option value="remote">{tr('Remote', 'عن بُعد')}</option>
+                <option value="hybrid">{tr('Hybrid', 'هجين')}</option>
               </select>
             </div>
           </div>
@@ -343,7 +344,7 @@ function Home() {
           {(searchTerm || locationFilter || jobTypeFilter || workModeFilter) && (
             <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Page {currentPage} of {totalPages}
+                {tr('Page', 'صفحة')} {currentPage} {tr('of', 'من')} {totalPages}
               </p>
               <button
                 onClick={clearFilters}
@@ -359,22 +360,22 @@ function Home() {
       {/* Jobs Listing */}
       <section className="container mx-auto px-4 pb-8 sm:pb-12">
         <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-gray-800 dark:text-gray-100">
-          {sortBy === 'recommended' && showAIFeatures ? `🤖 ${t('home.recommendedForYou')}` : 'All Jobs'}
+          {sortBy === 'recommended' && showAIFeatures ? `🤖 ${t('home.recommendedForYou')}` : tr('All Jobs', 'كل الوظايف')}
         </h2>
 
         {loading ? (
-          <p className="text-gray-600 dark:text-gray-400">Loading jobs...</p>
+          <p className="text-gray-600 dark:text-gray-400">{tr('Loading jobs...', 'جاري تحميل الوظايف...')}</p>
         ) : jobs.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow text-center transition-colors">
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {jobs.length === 0 ? 'No jobs available at the moment.' : 'No jobs match your search criteria.'}
+              {tr('No jobs available at the moment.', 'مافيش وظايف متاحة دلوقتي.')}
             </p>
             {jobs.length > 0 && (
               <button
                 onClick={clearFilters}
                 className="px-6 py-2 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition"
               >
-                Clear Filters
+                {t('home.clearFilters')}
               </button>
             )}
           </div>
@@ -392,8 +393,8 @@ function Home() {
                   {user && user.user_type === 'job_seeker' && (
                     <button
                       onClick={(e) => handleSaveJob(e, job.id)}
-                      className="absolute top-4 right-4 text-2xl hover:scale-110 transition z-10"
-                      title={savedJobIds.has(job.id) ? 'Unsave job' : 'Save job'}
+                      className="absolute top-4 end-4 text-2xl hover:scale-110 transition z-10"
+                      title={savedJobIds.has(job.id) ? tr('Unsave job', 'إزالة من المحفوظات') : tr('Save job', 'حفظ الوظيفة')}
                     >
                       {savedJobIds.has(job.id) ? (
                         <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
@@ -411,11 +412,11 @@ function Home() {
                   {showAIFeatures && matchScore > 0 && (
                     <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold mb-3 ${matchLevel.bgColor} ${matchLevel.color} w-fit`}>
                       <span>{matchScore}%</span>
-                      <span>{matchLevel.level} Match</span>
+                      <span>{matchLevel.level} {tr('Match', 'تطابق')}</span>
                     </div>
                   )}
 
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2 pr-8">{job.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2 pe-8">{job.title}</h3>
                   <p className="text-primary dark:text-blue-400 font-semibold mb-2">{job.company}</p>
                   <div className="flex items-center text-gray-600 dark:text-gray-400 mb-2">
                     <span className="mr-2">📍</span>
@@ -430,9 +431,9 @@ function Home() {
                         job.work_mode === 'hybrid' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300' :
                           'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                         }`}>
-                        {job.work_mode === 'remote' ? '🏠 Remote' :
-                          job.work_mode === 'hybrid' ? '🔄 Hybrid' :
-                            '🏢 On-site'}
+                        {job.work_mode === 'remote' ? `🏠 ${tr('Remote', 'عن بُعد')}` :
+                          job.work_mode === 'hybrid' ? `🔄 ${tr('Hybrid', 'هجين')}` :
+                            `🏢 ${tr('On-site', 'في المقر')}`}
                       </span>
                     )}
                   </div>
@@ -446,7 +447,7 @@ function Home() {
                   {/* Match Reasons */}
                   {showAIFeatures && matchReasons.length > 0 && (
                     <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <p className="text-xs font-semibold text-blue-800 dark:text-blue-300 mb-2">Why this job:</p>
+                      <p className="text-xs font-semibold text-blue-800 dark:text-blue-300 mb-2">{tr('Why this job:', 'ليه الوظيفة دي:')}</p>
                       <ul className="space-y-1">
                         {matchReasons.slice(0, 2).map((reason, idx) => (
                           <li key={idx} className="text-xs text-blue-700 dark:text-blue-400 flex items-start gap-2">
@@ -462,7 +463,7 @@ function Home() {
                     onClick={() => handleApply(job.id)}
                     className="w-full bg-primary dark:bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold"
                   >
-                    Apply Now
+                    {tr('Apply Now', 'قدّم الآن')}
                   </button>
                 </div>
               );
@@ -498,7 +499,7 @@ function Home() {
               disabled={loadingMore}
               className="px-8 py-3 bg-primary dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-semibold disabled:opacity-50"
             >
-              {loadingMore ? 'Loading...' : `Load More Jobs (${currentPage} of ${totalPages})`}
+              {loadingMore ? tr('Loading...', 'جاري التحميل...') : tr(`Load More Jobs (${currentPage} of ${totalPages})`, `حمّل وظايف أكتر (${currentPage} من ${totalPages})`)}
             </button>
           </div>
         )}
